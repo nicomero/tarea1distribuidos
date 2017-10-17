@@ -12,6 +12,8 @@ public static void main(String[] args) throws IOException {
                 return;
         }
 
+        /**CONECTARSE AL MAIN SERVER PARA OBTENER DISTRITO**/
+
         // get a datagram socket
         DatagramSocket socket = new DatagramSocket();
 
@@ -30,7 +32,35 @@ public static void main(String[] args) throws IOException {
         String received = new String(packet.getData(), 0, packet.getLength());
         System.out.println("ip futura: " + received);
 
+        // cerrar socket
         socket.close();
+
+
+
+        /**CONECTARSE AL SERVIDOR DE UN DISTRITO**/
+
+        MulticastSocket socketD = new MulticastSocket(4446);
+        address = InetAddress.getByName(received);
+        socketD.joinGroup(address);
+
+        for (int i = 0; i < 5; i++) {
+
+                //byte[] buf = new byte[256];
+                packet = new DatagramPacket(buf, buf.length);
+                socketD.receive(packet);
+
+
+
+                String received_D = new String(packet.getData(), 0, packet.getLength());
+                System.out.println("Quote of the Moment: " + received_D);
+        }
+
+        socketD.leaveGroup(address);
+        socketD.close();
+
+
+
+
 }
 
 

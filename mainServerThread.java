@@ -29,7 +29,7 @@ public void run() {
                         socket.receive(packet);
 
                         //entregar ip a cliente
-                        String ipCity = "127.0.0.1";
+                        String ipCity = "230.0.0.1";
                         buf = ipCity.getBytes();
 
                         // send the response to the client at "address" and "port"
