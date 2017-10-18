@@ -59,16 +59,10 @@ public void run() {
                         DatagramPacket packet = new DatagramPacket(buf, buf.length);
                         socket.receive(packet);
 
-                        //entregar ip a cliente
-                        String ipCity = "230.0.0.1";
-                        buf = ipCity.getBytes();
+                        String received_D = recibir(packet);
+                        System.out.println("Quote of the Moment: " + received_D);
 
-                        // send the response to the client at "address" and "port"
-                        InetAddress address = packet.getAddress();
-                        int port = packet.getPort();
-
-                        packet = new DatagramPacket(buf, buf.length, address, port);
-                        socket.send(packet);
+                        enviarIp_multi("trost", packet);
 
                 } catch (IOException e) {
                         e.printStackTrace();
@@ -77,5 +71,40 @@ public void run() {
         }
         socket.close();
 }
+
+
+public void enviarIp_multi(String ciudad, DatagramPacket packet){
+
+        InetAddress address = packet.getAddress();
+        int port = packet.getPort();
+        enviarU("230.0.0.1", address, port);
+
+}
+
+public void enviarU(String mensaje, InetAddress ip_destino, int port){
+
+
+        try{
+                byte[] buf = new byte[256];
+
+                buf = mensaje.getBytes();
+                DatagramPacket packet = new DatagramPacket(buf, buf.length, ip_destino, port);
+                socket.send(packet);
+        }catch(IOException e) {
+                e.printStackTrace();
+        }
+}
+
+public String recibir(DatagramPacket packet){
+
+
+
+        // display response
+        String received = new String(packet.getData(), 0, packet.getLength());
+        return received;
+
+}
+
+
 
 }
