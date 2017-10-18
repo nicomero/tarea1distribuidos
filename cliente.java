@@ -50,10 +50,6 @@ public static void main(String[] args) throws IOException {
 
         // send request
 
-
-        byte[] buf = new byte[256]; //si las funciones salen bien, borrar
-        InetAddress address = InetAddress.getByName(args[0]); //si las funciones salen bien, borrar
-
         enviarU("prueba", args[0], socket);
 
         // get response
@@ -71,7 +67,7 @@ public static void main(String[] args) throws IOException {
         /**CONECTARSE AL SERVIDOR DE UN DISTRITO**/
 
         MulticastSocket socketD = new MulticastSocket(4446);
-        address = InetAddress.getByName(received);
+        InetAddress address = InetAddress.getByName(received);
         socketD.joinGroup(address);
 
         for (int i = 0; i < 5; i++) {
