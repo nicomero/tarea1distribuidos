@@ -38,7 +38,7 @@ public class mainServerThread extends Thread {
 protected DatagramSocket socket = null;
 protected BufferedReader in = null;
 protected boolean moreQuotes = true;
-//protected List<String> distritos = new ArrayList<String>("Trost","Shiganshina");
+List<String> distritos = new ArrayList<String>(Arrays.asList("trost", "pablost"));
 
 public mainServerThread() throws IOException {
         this("QuoteServerThread");
@@ -53,12 +53,14 @@ public void run() {
 
         while (moreQuotes) {
                 try {
+                        byte[] buf = new byte[256];
                         //Recibir el paquete para determinar lo que el cliente quiere
                         DatagramPacket packet = new DatagramPacket(buf, buf.length);
                         socket.receive(packet);
 
                         String received_D = recibir(packet);
                         System.out.println("Quote of the Moment: " + received_D);
+                        System.out.println("Quote of the Moment: " + distritos.get(0));
 
                         //en caso de que quiera ip multicast
                         enviarIp_multi("trost", packet);

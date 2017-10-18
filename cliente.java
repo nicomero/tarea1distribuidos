@@ -50,7 +50,7 @@ public static void main(String[] args) throws IOException {
 
         // send request
 
-        enviarU("prueba", args[0], socket);
+        enviarU("trost", args[0], socket);
 
         // get response
 
