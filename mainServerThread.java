@@ -53,15 +53,14 @@ public void run() {
 
         while (moreQuotes) {
                 try {
-                        byte[] buf = new byte[256];
-
-                        // receive request
+                        //Recibir el paquete para determinar lo que el cliente quiere
                         DatagramPacket packet = new DatagramPacket(buf, buf.length);
                         socket.receive(packet);
 
                         String received_D = recibir(packet);
                         System.out.println("Quote of the Moment: " + received_D);
 
+                        //en caso de que quiera ip multicast
                         enviarIp_multi("trost", packet);
 
                 } catch (IOException e) {
@@ -73,14 +72,20 @@ public void run() {
 }
 
 
-public void enviarIp_multi(String ciudad, DatagramPacket packet){
+//enviar ip multicast
+public void enviarIp_multi(String distrito, DatagramPacket packet){
 
+        //extraer puerto y direccion
         InetAddress address = packet.getAddress();
         int port = packet.getPort();
+
+        //enviar ip del distrito que solicito
         enviarU("230.0.0.1", address, port);
 
 }
 
+
+//enviar un mensaje a la direccion y puerto dados
 public void enviarU(String mensaje, InetAddress ip_destino, int port){
 
 
@@ -95,6 +100,8 @@ public void enviarU(String mensaje, InetAddress ip_destino, int port){
         }
 }
 
+
+//recibe un mensaje en formato string para retornarlo
 public String recibir(DatagramPacket packet){
 
 

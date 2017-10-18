@@ -83,6 +83,7 @@ public static void main(String[] args) throws IOException {
 }
 
 
+//envia un mensaje a la ip dada por cierto socket
 public static void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
 
 
@@ -99,6 +100,7 @@ public static void enviarU(String mensaje, String ip_destino, DatagramSocket soc
         }
 }
 
+//recibe un mensaje del socket
 public static String recibir(DatagramSocket socket){
 
 
