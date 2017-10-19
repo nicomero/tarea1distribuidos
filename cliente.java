@@ -35,89 +35,80 @@ import java.util.*;
 
 public class cliente {
 
-public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
+		//======================================================
+        //	CONECTARSE AL MAIN SERVER
+		//======================================================
 
-        //recordar de agregar la ip
-        if (args.length != 1) {
-                System.out.println("Usage: java cliente <hostname>");
-                return;
-        }
+		String ipServer = "";
+		String puertoServer = "";
 
-        /**CONECTARSE AL MAIN SERVER PARA OBTENER DISTRITO**/
+		System.out.println ("[Cliente] Ingresar IP Servidor Central");
+		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
+		ipServer = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+		System.out.println ("[Cliente] Ingresar Puerto Servidor Central");
+		puertoServer = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
 
         // get a datagram socket
         DatagramSocket socket = new DatagramSocket();
-
         // send request
-
-        enviarU("trost", args[0], socket);
+        enviarU("Trost", ipServer, puertoServer, socket);
 
         // get response
-
         String received = recibir(socket);
-        System.out.println("----- ip futura: " + received);
-
+		//[NombreDistrito,ipMulticast,puertoMulticast]
+		List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
         // cerrar socket
         socket.close();
 
+		//======================================================
+        //	CONECTARSE AL SERVIDOR DE UN DISTRITO
+		//======================================================
 
-
-
-
-        /**CONECTARSE AL SERVIDOR DE UN DISTRITO**/
-
-        MulticastSocket socketD = new MulticastSocket(4446);
-        InetAddress address = InetAddress.getByName(received);
+		//puerto conexión multicast
+        MulticastSocket socketD = new MulticastSocket(Integer.parseInt(info.get(2)));
+        InetAddress address = InetAddress.getByName(info.get(1));
         socketD.joinGroup(address);
 
-        for (int i = 0; i < 5; i++) {
-
-                String received_D = recibir(socketD);
-                System.out.println("Quote of the Moment: " + received_D);
+        for (int i = 0; i < 15; i++) {
+            String received_D = recibir(socketD);
+            System.out.println("Date: " + received_D);
         }
 
         socketD.leaveGroup(address);
         socketD.close();
+	}
 
-
-}
-
-
-//envia un mensaje a la ip dada por cierto socket
-public static void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
-
-
+	//envia un mensaje a la ip dada por cierto socket
+	public static void enviarU(String mensaje, String ip_destino, String puerto_destino, DatagramSocket socket){
 
         try{
-                byte[] buf = new byte[256];
+            byte[] buf = new byte[256];
 
-                InetAddress address = InetAddress.getByName(ip_destino);
-                buf = mensaje.getBytes();
-                DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445); //viene con puerto de defecto
-                socket.send(packet);
+            InetAddress address = InetAddress.getByName(ip_destino);
+            buf = mensaje.getBytes();
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino)); //viene con puerto de defecto
+            socket.send(packet);
         }catch(IOException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
-}
+	}
 
-//recibe un mensaje del socket
-public static String recibir(DatagramSocket socket){
-
-
+	//recibe un mensaje del socket
+	public static String recibir(DatagramSocket socket){
         try{
-                byte[] buf = new byte[256];
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                socket.receive(packet);
+            byte[] buf = new byte[256];
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            socket.receive(packet);
 
-                // display response
-                String received = new String(packet.getData(), 0, packet.getLength());
-                return received;
+            // display response
+            String received = new String(packet.getData(), 0, packet.getLength());
+            return received;
         }catch(IOException e) {
                 e.printStackTrace();
         }
         return "mensajegenerico";
-}
+	}
 
-
-
-}
+}//end class cliente
