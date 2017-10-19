@@ -35,58 +35,48 @@ import java.util.*;
 
 public class districtServerThread extends Thread {
 
-private long FIVE_SECONDS = 5000;
-protected DatagramSocket socket = null;
-protected BufferedReader in = null;
-protected boolean moreQuotes = true;
+	private long FIVE_SECONDS = 5000;
+	protected DatagramSocket socket = null;
+	protected BufferedReader in = null;
+	protected boolean moreQuotes = true;
 
-public districtServerThread() throws IOException {
+	public districtServerThread() throws IOException {
         this("MulticastServerThread");
-}
+	}
 
-public districtServerThread(String name) throws IOException {
+	public districtServerThread(String name) throws IOException {
         super(name);
-        socket = new DatagramSocket(4445);
+        socket = new DatagramSocket(6789);
+	}
 
-}
-
-
-
-public void run() {
+	public void run() {
         while (moreQuotes) {
+            // construct quote
+            String dString = null;
+            dString = new Date().toString();
 
-                        // construct quote
-                        String dString = null;
-                        dString = new Date().toString();
+            enviarU(dString, "230.0.0.1", socket);
 
-                        enviarU(dString, "230.0.0.1", socket);
-
-                        // sleep for a while
-                        try {
-                                sleep((long)(Math.random() * FIVE_SECONDS));
-                        } catch (InterruptedException e) { }
+            // sleep for a while
+            try {
+                    sleep((long)(Math.random() * FIVE_SECONDS));
+            } catch (InterruptedException e) { }
         }
         socket.close();
-}
+	}
 
-public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
-
-
-
+	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
         try{
-                byte[] buf = new byte[256];
+            byte[] buf = new byte[256];
 
-                InetAddress address = InetAddress.getByName(ip_destino);
-                buf = mensaje.getBytes();
-                DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4446); //viene con puerto de defecto
-                socket.send(packet);
+            InetAddress address = InetAddress.getByName(ip_destino);
+            buf = mensaje.getBytes();
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 5555); //viene con puerto de defecto
+            socket.send(packet);
         }catch(IOException e) {
-                System.out.println("ilprob");
-                e.printStackTrace();
+            System.out.println("ilprob");
+            e.printStackTrace();
         }
-}
+	}
 
-
-
-
-}
+}//end districtServerThread

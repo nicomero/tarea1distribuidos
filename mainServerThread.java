@@ -35,85 +35,80 @@ import java.util.*;
 
 public class mainServerThread extends Thread {
 
-protected DatagramSocket socket = null;
-protected BufferedReader in = null;
-protected boolean moreQuotes = true;
-List<String> distritos = new ArrayList<String>(Arrays.asList("trost", "pablost"));
+	protected DatagramSocket socket = null;
+	protected BufferedReader in = null;
+	protected boolean moreQuotes = true;
+	List<String> distritos = new ArrayList<String>(Arrays.asList("trost", "pablost"));
 
-public mainServerThread() throws IOException {
+	public mainServerThread() throws IOException {
         this("QuoteServerThread");
-}
+	}
 
-public mainServerThread(String name) throws IOException {
+	public mainServerThread(String name) throws IOException {
         super(name);
         socket = new DatagramSocket(4445);
-}
+	}
 
-public void run() {
+	public void run() {
+	    while (moreQuotes) {
+	        try {
+				//
+			   	System.out.println ("Por favor introduzca una cadena por teclado:");
+			   	String entradaTeclado = "";
+			   	Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
+			   	entradaTeclado = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+				//
 
-        while (moreQuotes) {
-                try {
-                        byte[] buf = new byte[256];
-                        //Recibir el paquete para determinar lo que el cliente quiere
-                        DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                        socket.receive(packet);
+	            byte[] buf = new byte[256];
+	            //Recibir el paquete para determinar lo que el cliente quiere
+	            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+	            socket.receive(packet);
 
-                        String received_D = recibir(packet);
-                        System.out.println("Quote of the Moment: " + received_D);
-                        System.out.println("Quote of the Moment: " + distritos.get(0));
+	            String received_D = recibir(packet);
+	            System.out.println("Quote of the Moment: " + received_D);
+	            System.out.println("Quote of the Moment: " + distritos.get(0));
 
-                        //en caso de que quiera ip multicast
-                        enviarIp_multi("trost", packet);
+	            //en caso de que quiera ip multicast
+	            enviarIp_multi("trost", packet);
 
-                } catch (IOException e) {
-                        e.printStackTrace();
-                        moreQuotes = false;
-                }
-        }
-        socket.close();
-}
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            moreQuotes = false;
+	        }
+	    }
+	    socket.close();
+	}
 
+	//enviar ip multicast
+	public void enviarIp_multi(String distrito, DatagramPacket packet){
+	    //extraer puerto y direccion
+	    InetAddress address = packet.getAddress();
+	    int port = packet.getPort();
 
-//enviar ip multicast
-public void enviarIp_multi(String distrito, DatagramPacket packet){
+	    //enviar ip del distrito que solicito
+		System.out.println("address: "+address);
+		System.out.println("port: "+port);
+	    enviarU("230.0.0.1", address, port);
+	}
 
-        //extraer puerto y direccion
-        InetAddress address = packet.getAddress();
-        int port = packet.getPort();
+	//enviar un mensaje a la direccion y puerto dados
+	public void enviarU(String mensaje, InetAddress ip_destino, int port){
+	    try{
+	        byte[] buf = new byte[256];
 
-        //enviar ip del distrito que solicito
-        enviarU("230.0.0.1", address, port);
+	        buf = mensaje.getBytes();
+	        DatagramPacket packet = new DatagramPacket(buf, buf.length, ip_destino, port);
+	        socket.send(packet);
+	    }catch(IOException e) {
+	        e.printStackTrace();
+	    }
+	}
 
-}
+	//recibe un mensaje en formato string para retornarlo
+	public String recibir(DatagramPacket packet){
 
-
-//enviar un mensaje a la direccion y puerto dados
-public void enviarU(String mensaje, InetAddress ip_destino, int port){
-
-
-        try{
-                byte[] buf = new byte[256];
-
-                buf = mensaje.getBytes();
-                DatagramPacket packet = new DatagramPacket(buf, buf.length, ip_destino, port);
-                socket.send(packet);
-        }catch(IOException e) {
-                e.printStackTrace();
-        }
-}
-
-
-//recibe un mensaje en formato string para retornarlo
-public String recibir(DatagramPacket packet){
-
-
-
-        // display response
-        String received = new String(packet.getData(), 0, packet.getLength());
-        return received;
-
-}
-
-
-
-}
+	    // display response
+	    String received = new String(packet.getData(), 0, packet.getLength());
+	    return received;
+	}
+}//end mainServerThread

@@ -35,25 +35,22 @@ import java.util.*;
 
 public class cliente {
 
-public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
 
         //recordar de agregar la ip
         if (args.length != 1) {
-                System.out.println("Usage: java cliente <hostname>");
-                return;
+            System.out.println("Usage: java cliente <hostname>");
+            return;
         }
 
         /**CONECTARSE AL MAIN SERVER PARA OBTENER DISTRITO**/
-
         // get a datagram socket
         DatagramSocket socket = new DatagramSocket();
 
         // send request
-
         enviarU("trost", args[0], socket);
 
         // get response
-
         String received = recibir(socket);
         System.out.println("----- ip futura: " + received);
 
@@ -61,63 +58,50 @@ public static void main(String[] args) throws IOException {
         socket.close();
 
 
-
-
-
         /**CONECTARSE AL SERVIDOR DE UN DISTRITO**/
-
-        MulticastSocket socketD = new MulticastSocket(4446);
+        MulticastSocket socketD = new MulticastSocket(5555);
         InetAddress address = InetAddress.getByName(received);
         socketD.joinGroup(address);
 
         for (int i = 0; i < 5; i++) {
 
-                String received_D = recibir(socketD);
-                System.out.println("Quote of the Moment: " + received_D);
+            String received_D = recibir(socketD);
+            System.out.println("Quote of the Moment: " + received_D);
         }
 
         socketD.leaveGroup(address);
         socketD.close();
+	}
 
-
-}
-
-
-//envia un mensaje a la ip dada por cierto socket
-public static void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
-
-
+	//envia un mensaje a la ip dada por cierto socket
+	public static void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
 
         try{
-                byte[] buf = new byte[256];
+            byte[] buf = new byte[256];
 
-                InetAddress address = InetAddress.getByName(ip_destino);
-                buf = mensaje.getBytes();
-                DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445); //viene con puerto de defecto
-                socket.send(packet);
+            InetAddress address = InetAddress.getByName(ip_destino);
+            buf = mensaje.getBytes();
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445); //viene con puerto de defecto
+            socket.send(packet);
         }catch(IOException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
-}
+	}
 
-//recibe un mensaje del socket
-public static String recibir(DatagramSocket socket){
-
-
+	//recibe un mensaje del socket
+	public static String recibir(DatagramSocket socket){
         try{
-                byte[] buf = new byte[256];
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                socket.receive(packet);
+            byte[] buf = new byte[256];
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            socket.receive(packet);
 
-                // display response
-                String received = new String(packet.getData(), 0, packet.getLength());
-                return received;
+            // display response
+            String received = new String(packet.getData(), 0, packet.getLength());
+            return received;
         }catch(IOException e) {
                 e.printStackTrace();
         }
         return "mensajegenerico";
-}
+	}
 
-
-
-}
+}//end class cliente
