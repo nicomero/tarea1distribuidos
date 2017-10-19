@@ -118,7 +118,7 @@ public class mainServerThread extends Thread {
 	    InetAddress address = packet.getAddress();
 	    int port = packet.getPort();
 	    //enviar ip del distrito que solicito
-	    enviarU(ipMulti.get(0), address, port);
+	    enviarU(distrito+","+ipMulti.get(0)+","+puertoMulti.get(0), address, port);
 	}
 
 	//enviar un mensaje a la direccion y puerto dados

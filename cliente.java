@@ -36,6 +36,9 @@ import java.util.*;
 public class cliente {
 
 	public static void main(String[] args) throws IOException {
+		//======================================================
+        //	CONECTARSE AL MAIN SERVER
+		//======================================================
 
 		String ipServer = "";
 		String puertoServer = "";
@@ -47,7 +50,6 @@ public class cliente {
 		System.out.println ("[Cliente] Ingresar Puerto Servidor Central");
 		puertoServer = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
 
-        /**CONECTARSE AL MAIN SERVER PARA OBTENER DISTRITO**/
         // get a datagram socket
         DatagramSocket socket = new DatagramSocket();
         // send request
@@ -55,14 +57,18 @@ public class cliente {
 
         // get response
         String received = recibir(socket);
-        System.out.println("Recibida IP Distrito: " + received);
+		//[NombreDistrito,ipMulticast,puertoMulticast]
+		List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
         // cerrar socket
         socket.close();
 
-        /**CONECTARSE AL SERVIDOR DE UN DISTRITO**/
+		//======================================================
+        //	CONECTARSE AL SERVIDOR DE UN DISTRITO
+		//======================================================
+
 		//puerto conexión multicast
-        MulticastSocket socketD = new MulticastSocket(5555);
-        InetAddress address = InetAddress.getByName(received);
+        MulticastSocket socketD = new MulticastSocket(Integer.parseInt(info.get(2)));
+        InetAddress address = InetAddress.getByName(info.get(1));
         socketD.joinGroup(address);
 
         for (int i = 0; i < 15; i++) {
