@@ -38,7 +38,7 @@ public class mainServerThread extends Thread {
 protected DatagramSocket socket = null;
 protected BufferedReader in = null;
 protected boolean moreQuotes = true;
-//protected List<String> distritos = new ArrayList<String>("Trost","Shiganshina");
+List<String> distritos = new ArrayList<String>(Arrays.asList("trost", "pablost"));
 
 public mainServerThread() throws IOException {
         this("QuoteServerThread");
@@ -54,21 +54,16 @@ public void run() {
         while (moreQuotes) {
                 try {
                         byte[] buf = new byte[256];
-
-                        // receive request
+                        //Recibir el paquete para determinar lo que el cliente quiere
                         DatagramPacket packet = new DatagramPacket(buf, buf.length);
                         socket.receive(packet);
 
-                        //entregar ip a cliente
-                        String ipCity = "230.0.0.1";
-                        buf = ipCity.getBytes();
+                        String received_D = recibir(packet);
+                        System.out.println("Quote of the Moment: " + received_D);
+                        System.out.println("Quote of the Moment: " + distritos.get(0));
 
-                        // send the response to the client at "address" and "port"
-                        InetAddress address = packet.getAddress();
-                        int port = packet.getPort();
-
-                        packet = new DatagramPacket(buf, buf.length, address, port);
-                        socket.send(packet);
+                        //en caso de que quiera ip multicast
+                        enviarIp_multi("trost", packet);
 
                 } catch (IOException e) {
                         e.printStackTrace();
@@ -77,5 +72,48 @@ public void run() {
         }
         socket.close();
 }
+
+
+//enviar ip multicast
+public void enviarIp_multi(String distrito, DatagramPacket packet){
+
+        //extraer puerto y direccion
+        InetAddress address = packet.getAddress();
+        int port = packet.getPort();
+
+        //enviar ip del distrito que solicito
+        enviarU("230.0.0.1", address, port);
+
+}
+
+
+//enviar un mensaje a la direccion y puerto dados
+public void enviarU(String mensaje, InetAddress ip_destino, int port){
+
+
+        try{
+                byte[] buf = new byte[256];
+
+                buf = mensaje.getBytes();
+                DatagramPacket packet = new DatagramPacket(buf, buf.length, ip_destino, port);
+                socket.send(packet);
+        }catch(IOException e) {
+                e.printStackTrace();
+        }
+}
+
+
+//recibe un mensaje en formato string para retornarlo
+public String recibir(DatagramPacket packet){
+
+
+
+        // display response
+        String received = new String(packet.getData(), 0, packet.getLength());
+        return received;
+
+}
+
+
 
 }

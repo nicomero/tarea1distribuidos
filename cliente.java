@@ -49,40 +49,30 @@ public static void main(String[] args) throws IOException {
         DatagramSocket socket = new DatagramSocket();
 
         // send request
-        byte[] buf = new byte[256];
-        InetAddress address = InetAddress.getByName(args[0]);
 
-        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445);
-        socket.send(packet);
+        enviarU("trost", args[0], socket);
 
         // get response
-        packet = new DatagramPacket(buf, buf.length);
-        socket.receive(packet);
 
-        // display response
-        String received = new String(packet.getData(), 0, packet.getLength());
-        System.out.println("ip futura: " + received);
+        String received = recibir(socket);
+        System.out.println("----- ip futura: " + received);
 
         // cerrar socket
         socket.close();
 
 
 
+
+
         /**CONECTARSE AL SERVIDOR DE UN DISTRITO**/
 
         MulticastSocket socketD = new MulticastSocket(4446);
-        address = InetAddress.getByName(received);
+        InetAddress address = InetAddress.getByName(received);
         socketD.joinGroup(address);
 
         for (int i = 0; i < 5; i++) {
 
-                //byte[] buf = new byte[256];
-                packet = new DatagramPacket(buf, buf.length);
-                socketD.receive(packet);
-
-
-
-                String received_D = new String(packet.getData(), 0, packet.getLength());
+                String received_D = recibir(socketD);
                 System.out.println("Quote of the Moment: " + received_D);
         }
 
@@ -90,9 +80,44 @@ public static void main(String[] args) throws IOException {
         socketD.close();
 
 
-
-
 }
+
+
+//envia un mensaje a la ip dada por cierto socket
+public static void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
+
+
+
+        try{
+                byte[] buf = new byte[256];
+
+                InetAddress address = InetAddress.getByName(ip_destino);
+                buf = mensaje.getBytes();
+                DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445); //viene con puerto de defecto
+                socket.send(packet);
+        }catch(IOException e) {
+                e.printStackTrace();
+        }
+}
+
+//recibe un mensaje del socket
+public static String recibir(DatagramSocket socket){
+
+
+        try{
+                byte[] buf = new byte[256];
+                DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                socket.receive(packet);
+
+                // display response
+                String received = new String(packet.getData(), 0, packet.getLength());
+                return received;
+        }catch(IOException e) {
+                e.printStackTrace();
+        }
+        return "mensajegenerico";
+}
+
 
 
 }
