@@ -37,36 +37,37 @@ public class cliente {
 
 	public static void main(String[] args) throws IOException {
 
-        //recordar de agregar la ip
-        if (args.length != 1) {
-            System.out.println("Usage: java cliente <hostname>");
-            return;
-        }
+		String ipServer = "";
+		String puertoServer = "";
+
+		System.out.println ("[Cliente] Ingresar IP Servidor Central");
+		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
+		ipServer = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+		System.out.println ("[Cliente] Ingresar Puerto Servidor Central");
+		puertoServer = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
 
         /**CONECTARSE AL MAIN SERVER PARA OBTENER DISTRITO**/
         // get a datagram socket
         DatagramSocket socket = new DatagramSocket();
-
         // send request
-        enviarU("trost", args[0], socket);
+        enviarU("Trost", ipServer, puertoServer, socket);
 
         // get response
         String received = recibir(socket);
-        System.out.println("----- ip futura: " + received);
-
+        System.out.println("Recibida IP Distrito: " + received);
         // cerrar socket
         socket.close();
 
-
         /**CONECTARSE AL SERVIDOR DE UN DISTRITO**/
+		//puerto conexión multicast
         MulticastSocket socketD = new MulticastSocket(5555);
         InetAddress address = InetAddress.getByName(received);
         socketD.joinGroup(address);
 
-        for (int i = 0; i < 5; i++) {
-
+        for (int i = 0; i < 15; i++) {
             String received_D = recibir(socketD);
-            System.out.println("Quote of the Moment: " + received_D);
+            System.out.println("Date: " + received_D);
         }
 
         socketD.leaveGroup(address);
@@ -74,14 +75,14 @@ public class cliente {
 	}
 
 	//envia un mensaje a la ip dada por cierto socket
-	public static void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
+	public static void enviarU(String mensaje, String ip_destino, String puerto_destino, DatagramSocket socket){
 
         try{
             byte[] buf = new byte[256];
 
             InetAddress address = InetAddress.getByName(ip_destino);
             buf = mensaje.getBytes();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445); //viene con puerto de defecto
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino)); //viene con puerto de defecto
             socket.send(packet);
         }catch(IOException e) {
             e.printStackTrace();

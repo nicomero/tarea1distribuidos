@@ -38,7 +38,11 @@ public class mainServerThread extends Thread {
 	protected DatagramSocket socket = null;
 	protected BufferedReader in = null;
 	protected boolean moreQuotes = true;
-	List<String> distritos = new ArrayList<String>(Arrays.asList("trost", "pablost"));
+	List<String> distritos = new ArrayList<String>();
+	List<String> ipMulti = new ArrayList<String>();
+	List<String> puertoMulti = new ArrayList<String>();
+	List<String> ipPeti = new ArrayList<String>();
+	List<String> puertoPeti = new ArrayList<String>();
 
 	public mainServerThread() throws IOException {
         this("QuoteServerThread");
@@ -46,6 +50,7 @@ public class mainServerThread extends Thread {
 
 	public mainServerThread(String name) throws IOException {
         super(name);
+		//puerto servidor central
         socket = new DatagramSocket(4445);
 	}
 
@@ -53,23 +58,51 @@ public class mainServerThread extends Thread {
 	    while (moreQuotes) {
 	        try {
 				//
-			   	System.out.println ("Por favor introduzca una cadena por teclado:");
-			   	String entradaTeclado = "";
+				String nDistrito = "";
+				String ipM = "";
+				String puertoM = "";
+				String ipP = "";
+				String puertoP = "";
+
+			   	System.out.println ("[Servidor Central] Nombre Distrito:");
 			   	Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
-			   	entradaTeclado = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
-				//
+			   	nDistrito = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
 
-	            byte[] buf = new byte[256];
-	            //Recibir el paquete para determinar lo que el cliente quiere
-	            DatagramPacket packet = new DatagramPacket(buf, buf.length);
-	            socket.receive(packet);
+				System.out.println ("[Servidor Central] IP Multicast:");
+			   	ipM = entradaEscaner.nextLine ();
 
-	            String received_D = recibir(packet);
-	            System.out.println("Quote of the Moment: " + received_D);
-	            System.out.println("Quote of the Moment: " + distritos.get(0));
+				System.out.println ("[Servidor Central] Puerto Multicast:");
+			   	puertoM = entradaEscaner.nextLine ();
 
-	            //en caso de que quiera ip multicast
-	            enviarIp_multi("trost", packet);
+				System.out.println ("[Servidor Central] IP Peticiones:");
+				ipP = entradaEscaner.nextLine ();
+
+				System.out.println ("[Servidor Central] Puerto Peticiones:");
+			   	puertoP = entradaEscaner.nextLine ();
+
+				distritos.add(nDistrito);
+				ipMulti.add(ipM);
+				puertoMulti.add(puertoM);
+				ipPeti.add(ipP);
+				puertoPeti.add(puertoP);
+				/*System.out.println(Arrays.deepToString(distritos.toArray()));
+				System.out.println(Arrays.deepToString(ipMulti.toArray()));
+				System.out.println(Arrays.deepToString(puertoMulti.toArray()));
+				System.out.println(Arrays.deepToString(ipPeti.toArray()));
+				System.out.println(Arrays.deepToString(puertoPeti.toArray()));*/
+
+				while(true){
+					byte[] buf = new byte[256];
+		            //Recibir el paquete para determinar lo que el cliente quiere
+		            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+		            socket.receive(packet);
+
+		            String received_D = recibir(packet);
+		            System.out.println("Pidiendo distrito: " + received_D);
+
+		            //en caso de que quiera ip multicast
+		            enviarIp_multi("Trost", packet);
+				}
 
 	        } catch (IOException e) {
 	            e.printStackTrace();
@@ -84,11 +117,8 @@ public class mainServerThread extends Thread {
 	    //extraer puerto y direccion
 	    InetAddress address = packet.getAddress();
 	    int port = packet.getPort();
-
 	    //enviar ip del distrito que solicito
-		System.out.println("address: "+address);
-		System.out.println("port: "+port);
-	    enviarU("230.0.0.1", address, port);
+	    enviarU(ipMulti.get(0), address, port);
 	}
 
 	//enviar un mensaje a la direccion y puerto dados

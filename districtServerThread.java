@@ -46,6 +46,7 @@ public class districtServerThread extends Thread {
 
 	public districtServerThread(String name) throws IOException {
         super(name);
+		//puerto distrito, distinto del ip multicast
         socket = new DatagramSocket(6789);
 	}
 
@@ -59,7 +60,7 @@ public class districtServerThread extends Thread {
 
             // sleep for a while
             try {
-                    sleep((long)(Math.random() * FIVE_SECONDS));
+                sleep((long)(Math.random() * FIVE_SECONDS));
             } catch (InterruptedException e) { }
         }
         socket.close();
