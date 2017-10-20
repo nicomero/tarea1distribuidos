@@ -6,7 +6,8 @@ Nicolas Alarcon
 Rodrigo Elicer
 
 * Abrir mainServer
-`AGREGAR DISTRITO
+```
+AGREGAR DISTRITO
 [Servidor Central] Nombre Distrito:
 Trost
 [Servidor Central] IP Multicast:
@@ -28,10 +29,11 @@ Panchitolandia
 6788
 ¿Desea seguir agregando distritos?[y/n]
 n
-`
+```
 
 * Abrir districtServer 1
-`[Distrito] Nombre Distrito:
+```
+[Distrito] Nombre Distrito:
 Trost
 [Distrito Trost] IP Multicast:
 230.0.0.1
@@ -39,10 +41,11 @@ Trost
 5555
 [Distrito Trost] Puerto Peticiones:
 6789
-`
+```
 
 * Abrir districtServer 2
-`[Distrito] Nombre Distrito:
+```
+[Distrito] Nombre Distrito:
 Panchitolandia
 [Distrito Trost] IP Multicast:
 231.0.0.1
@@ -50,23 +53,24 @@ Panchitolandia
 5556
 [Distrito Trost] Puerto Peticiones:
 6788
-
-`
+```
 
 * Abrir cliente 1
-`[Cliente] Ingresar IP Servidor Central:
+```
+[Cliente] Ingresar IP Servidor Central:
 127.0.0.1
 [Cliente] Ingresar Puerto Servidor Central:
 4445
 [Cliente] Introducir Nombre de Distrito a Investigar:
 Trost
-`
+```
 
 * Abrir cliente 2
-`[Cliente] Ingresar IP Servidor Central:
+```
+[Cliente] Ingresar IP Servidor Central:
 127.0.0.1
 [Cliente] Ingresar Puerto Servidor Central:
 4445
 [Cliente] Introducir Nombre de Distrito a Investigar:
 Panchitolandia
-`
+```
