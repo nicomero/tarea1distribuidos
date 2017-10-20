@@ -45,12 +45,6 @@ public class mainServerThread extends Thread {
 	List<String> puertoPeti = new ArrayList<String>();
 
 	public mainServerThread() throws IOException {
-        this("QuoteServerThread");
-	}
-
-	public mainServerThread(String name) throws IOException {
-        super(name);
-		//puerto servidor central
         socket = new DatagramSocket(4445);
 	}
 

@@ -41,12 +41,6 @@ public class districtServerThread extends Thread {
 	protected boolean moreQuotes = true;
 
 	public districtServerThread() throws IOException {
-        this("MulticastServerThread");
-	}
-
-	public districtServerThread(String name) throws IOException {
-        super(name);
-		//puerto distrito, distinto del ip multicast
         socket = new DatagramSocket(6789);
 	}
 
