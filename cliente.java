@@ -42,23 +42,28 @@ public class cliente {
 
 		String ipServer = "";
 		String puertoServer = "";
+		String nDistrito = "";
 
-		System.out.println ("[Cliente] Ingresar IP Servidor Central");
+		System.out.println ("[Cliente] Ingresar IP Servidor Central:");
 		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
 		ipServer = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
 
-		System.out.println ("[Cliente] Ingresar Puerto Servidor Central");
-		puertoServer = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		System.out.println ("[Cliente] Ingresar Puerto Servidor Central:");
+		puertoServer = entradaEscaner.nextLine ();
+
+		System.out.println ("[Cliente] Introducir Nombre de Distrito a Investigar:");
+		nDistrito = entradaEscaner.nextLine ();
 
         // get a datagram socket
         DatagramSocket socket = new DatagramSocket();
         // send request
-        enviarU("Trost", ipServer, puertoServer, socket);
+        enviarU(nDistrito, ipServer, puertoServer, socket);
 
         // get response
         String received = recibir(socket);
-		//[NombreDistrito,ipMulticast,puertoMulticast]
+		//[NombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
 		List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
+		System.out.println(info);
         // cerrar socket
         socket.close();
 
@@ -71,7 +76,7 @@ public class cliente {
         InetAddress address = InetAddress.getByName(info.get(1));
         socketD.joinGroup(address);
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 5; i++) {
             String received_D = recibir(socketD);
             System.out.println("Date: " + received_D);
         }

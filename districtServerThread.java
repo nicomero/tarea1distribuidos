@@ -39,18 +39,34 @@ public class districtServerThread extends Thread {
 	protected DatagramSocket socket = null;
 	protected BufferedReader in = null;
 	protected boolean moreQuotes = true;
+	int puerto;
+	String nDistrito = "";
+	String ipMulti = "";
+	String puertoMulti = "";
+	String puertoPeti = "";
 
 	public districtServerThread() throws IOException {
-        socket = new DatagramSocket(6789);
+		System.out.println ("[Distrito] Nombre Distrito:");
+		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
+		nDistrito = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+		System.out.println ("[Distrito "+nDistrito+"] IP Multicast:");
+		ipMulti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+		System.out.println ("[Distrito "+nDistrito+"] Puerto Multicast:");
+		puertoMulti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+		System.out.println ("[Distrito "+nDistrito+"] Puerto Peticiones:");
+		puertoPeti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+        socket = new DatagramSocket(Integer.parseInt(puertoPeti));
 	}
 
 	public void run() {
         while (moreQuotes) {
-            // construct quote
-            String dString = null;
-            dString = new Date().toString();
+            String dString = new Date().toString();
 
-            enviarU(dString, "230.0.0.1", socket);
+            enviarU(dString+" "+nDistrito, ipMulti, socket);
 
             // sleep for a while
             try {
@@ -66,7 +82,7 @@ public class districtServerThread extends Thread {
 
             InetAddress address = InetAddress.getByName(ip_destino);
             buf = mensaje.getBytes();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 5555); //viene con puerto de defecto
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puertoMulti));
             socket.send(packet);
         }catch(IOException e) {
             System.out.println("ilprob");

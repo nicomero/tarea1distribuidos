@@ -57,33 +57,42 @@ public class mainServerThread extends Thread {
 				String puertoM = "";
 				String ipP = "";
 				String puertoP = "";
+				String yn = "";
+				boolean seguir = true;
 
-			   	System.out.println ("[Servidor Central] Nombre Distrito:");
-			   	Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
-			   	nDistrito = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+				//Seguir preguntando por distritos a agregar
+				while(seguir){
+					System.out.println("AGREGAR DISTRITO");
+					System.out.println ("[Servidor Central] Nombre Distrito:");
+				   	Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
+				   	nDistrito = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
 
-				System.out.println ("[Servidor Central] IP Multicast:");
-			   	ipM = entradaEscaner.nextLine ();
+					System.out.println ("[Servidor Central] IP Multicast:");
+				   	ipM = entradaEscaner.nextLine ();
 
-				System.out.println ("[Servidor Central] Puerto Multicast:");
-			   	puertoM = entradaEscaner.nextLine ();
+					System.out.println ("[Servidor Central] Puerto Multicast:");
+				   	puertoM = entradaEscaner.nextLine ();
 
-				System.out.println ("[Servidor Central] IP Peticiones:");
-				ipP = entradaEscaner.nextLine ();
+					//System.out.println ("[Servidor Central] IP Peticiones:");
+					ipP = "test";
+					//ipP = entradaEscaner.nextLine ();
 
-				System.out.println ("[Servidor Central] Puerto Peticiones:");
-			   	puertoP = entradaEscaner.nextLine ();
+					System.out.println ("[Servidor Central] Puerto Peticiones:");
+				   	puertoP = entradaEscaner.nextLine ();
 
-				distritos.add(nDistrito);
-				ipMulti.add(ipM);
-				puertoMulti.add(puertoM);
-				ipPeti.add(ipP);
-				puertoPeti.add(puertoP);
-				/*System.out.println(Arrays.deepToString(distritos.toArray()));
-				System.out.println(Arrays.deepToString(ipMulti.toArray()));
-				System.out.println(Arrays.deepToString(puertoMulti.toArray()));
-				System.out.println(Arrays.deepToString(ipPeti.toArray()));
-				System.out.println(Arrays.deepToString(puertoPeti.toArray()));*/
+					distritos.add(nDistrito);
+					ipMulti.add(ipM);
+					puertoMulti.add(puertoM);
+					ipPeti.add(ipP);
+					puertoPeti.add(puertoP);
+
+					System.out.println("¿Desea seguir agregando distritos?[y/n]");
+					yn = entradaEscaner.nextLine ();
+
+					if(yn.equals("n")){
+						seguir = !seguir;
+					}
+				}//end while
 
 				while(true){
 					byte[] buf = new byte[256];
@@ -95,7 +104,7 @@ public class mainServerThread extends Thread {
 		            System.out.println("Pidiendo distrito: " + received_D);
 
 		            //en caso de que quiera ip multicast
-		            enviarIp_multi("Trost", packet);
+		            enviarIp_multi(received_D, packet);
 				}
 
 	        } catch (IOException e) {
@@ -111,8 +120,17 @@ public class mainServerThread extends Thread {
 	    //extraer puerto y direccion
 	    InetAddress address = packet.getAddress();
 	    int port = packet.getPort();
-	    //enviar ip del distrito que solicito
-	    enviarU(distrito+","+ipMulti.get(0)+","+puertoMulti.get(0), address, port);
+		int i;
+		for(i=0;i<distritos.size();i++){
+			//enviar ip del distrito que solicito
+			if(distritos.get(i).equals(distrito)){
+				//[nombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
+				enviarU(distrito+","+ipMulti.get(i)+","+puertoMulti.get(i)+","+ipPeti.get(i)+","+puertoPeti.get(i), address, port);
+				return;
+			}
+		}
+		System.out.println("Distrito "+distrito+" no existe");
+		return;
 	}
 
 	//enviar un mensaje a la direccion y puerto dados
