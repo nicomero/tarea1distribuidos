@@ -73,14 +73,12 @@ public class districtServerThread extends Thread {
 		try{
 			while (moreQuotes) {
 
-
-				System.out.println("el while");
 				byte[] buf = new byte[256];
 				//Recibir el paquete para determinar lo que el cliente quiere
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
 				socket.receive(packet);
 
-				String received_D = recibir(packet);
+				String received_D = recibir(packet);//recibir peticiones del cliente
 				System.out.println("mensaje recibido: " + received_D);
 
 	        }
@@ -105,7 +103,7 @@ public class districtServerThread extends Thread {
         }
 	}
 
-	public void inputLocal(){
+	public void inputLocal(){	//funcion que se encarga de leer de consola
 		Thread t = new Thread(new Runnable(){
 			public void run(){
 

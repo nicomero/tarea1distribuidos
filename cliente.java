@@ -88,7 +88,7 @@ public class cliente {
 
 			detectarMulti(socketD);//detecta si hay algo escrito en el multicast
 
-	        while(masTitan) {
+	        while(masTitan) {//mientras se quieran hacer acciones en el distrito actual
 				enviarU("probando",info.get(3),info.get(4),socket);
 	            System.out.println ("[Cliente] Buscar mas titanes? si/no");
 				masTitan = "si".equals(entradaEscaner.nextLine());
@@ -132,14 +132,18 @@ public class cliente {
 
 	public static void detectarMulti(MulticastSocket socketD){
 		Thread t = new Thread(new Runnable(){
+
 			public void run(){
-				boolean flag = false;
-				while(!flag){
+
+				boolean flag = false; //indica si hay fallo en el socket
+
+				while(!flag){//mientras NO halla fallo en el socket
 
 					String received_D = recibir(socketD);
-	            	System.out.println("Date: " + received_D);
 					flag = received_D.equals("Fallo");
-
+					if (!flag){
+						System.out.println("Date: " + received_D);
+					}
 				}
 			}
 		});
