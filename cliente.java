@@ -83,10 +83,11 @@ public class cliente {
 	        InetAddress address = InetAddress.getByName(info.get(1));
 	        socketD.joinGroup(address);
 
+
+			detectarMulti(socketD);//detecta si hay algo escrito en el multicast
+
 	        while(masTitan) {
-	            String received_D = recibir(socketD);
-	            System.out.println("Date: " + received_D);
-				System.out.println ("[Cliente] Buscar mas titanes? si/no");
+	            System.out.println ("[Cliente] Buscar mas titanes? si/no");
 				masTitan = "si".equals(entradaEscaner.nextLine());
 
 	        }
@@ -125,6 +126,18 @@ public class cliente {
                 e.printStackTrace();
         }
         return "Fallo";
+	}
+
+	public static void detectarMulti(MulticastSocket socketD){
+		Thread t = new Thread(new Runnable(){
+			public void run(){
+				while(true){
+				String received_D = recibir(socketD);
+	            System.out.println("Date: " + received_D);
+				}
+			}
+		});
+		t.start();
 	}
 
 }//end class cliente

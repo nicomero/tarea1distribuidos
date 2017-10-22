@@ -63,8 +63,10 @@ public class districtServerThread extends Thread {
 	}
 
 	public void run() {
-		inputLocal();
-        while (moreQuotes) {
+
+		inputLocal();//funcion que lee desde consola
+
+		while (moreQuotes) {
 
 
 
