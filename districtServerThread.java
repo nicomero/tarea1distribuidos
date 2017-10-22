@@ -39,6 +39,8 @@ public class districtServerThread extends Thread {
 	protected DatagramSocket socket = null;
 	protected BufferedReader in = null;
 	protected boolean moreQuotes = true;
+	HashMap<Integer,String> titanes=new HashMap<Integer,String>();
+	int id = 0;
 	int puerto;
 	String nDistrito = "";
 	String ipMulti = "";
@@ -123,8 +125,11 @@ public class districtServerThread extends Thread {
 						input = scan.nextLine();
 
 						if(input.equals("Publicar titan")){
+
+							crearTitan();
+							System.out.println(Arrays.asList(titanes));
+
 							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
-							System.out.println("Todo bien c:");
 						}
 					}
 				}catch(IOException e){
@@ -143,6 +148,20 @@ public class districtServerThread extends Thread {
 	    // display response
 	    String received = new String(packet.getData(), 0, packet.getLength());
 	    return received;
+	}
+
+	public void crearTitan(){
+
+		Scanner scan = new Scanner(System.in);
+		String input;
+
+		System.out.println("Escoga nombre");
+		input = scan.nextLine();
+		System.out.println("Escoga tipo");
+		input = input + "," +scan.nextLine();
+		titanes.put(id, input);
+		id = id+1;
+
 	}
 
 }//end districtServerThread

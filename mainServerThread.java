@@ -95,6 +95,9 @@ public class mainServerThread extends Thread {
 					}
 				}//end while
 
+
+				/////*****EN ESTA PARTE SE INTERACTUA CON CLIENTES *****//////
+
 				while(true){
 					byte[] buf = new byte[256];
 		            //Recibir el paquete para determinar lo que el cliente quiere
@@ -116,7 +119,7 @@ public class mainServerThread extends Thread {
 	    socket.close();
 	}
 
-	//enviar ip multicast
+	//enviar ip multicast a clientes
 	public void enviarIp_multi(String distrito, DatagramPacket packet){
 	    //extraer puerto y direccion
 	    InetAddress address = packet.getAddress();
