@@ -126,19 +126,20 @@ public class cliente {
             // display response
             String received = new String(packet.getData(), 0, packet.getLength());
             return received;
-        }catch(IOException e) {
-				System.out.println("recibir cliente");
-                e.printStackTrace();
-        }
+        }catch(IOException e) {}
         return "Fallo";
 	}
 
 	public static void detectarMulti(MulticastSocket socketD){
 		Thread t = new Thread(new Runnable(){
 			public void run(){
-				while(true){
-				String received_D = recibir(socketD);
-	            System.out.println("Date: " + received_D);
+				boolean flag = false;
+				while(!flag){
+
+					String received_D = recibir(socketD);
+	            	System.out.println("Date: " + received_D);
+					flag = received_D.equals("Fallo");
+
 				}
 			}
 		});
