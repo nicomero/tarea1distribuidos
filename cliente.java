@@ -43,6 +43,8 @@ public class cliente {
 		String ipServer = "";
 		String puertoServer = "";
 		String nDistrito = "";
+		boolean masTitan = true;
+		boolean otroDist = true;
 
 		System.out.println ("[Cliente] Ingresar IP Servidor Central:");
 		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
@@ -76,9 +78,12 @@ public class cliente {
         InetAddress address = InetAddress.getByName(info.get(1));
         socketD.joinGroup(address);
 
-        for (int i = 0; i < 5; i++) {
+        while(masTitan) {
             String received_D = recibir(socketD);
             System.out.println("Date: " + received_D);
+			System.out.println ("[Cliente] Buscar mas titanes? si/no");
+			masTitan = "si".equals(entradaEscaner.nextLine());
+
         }
 
         socketD.leaveGroup(address);
