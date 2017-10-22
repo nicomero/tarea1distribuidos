@@ -43,6 +43,7 @@ public class mainServerThread extends Thread {
 	List<String> puertoMulti = new ArrayList<String>();
 	List<String> ipPeti = new ArrayList<String>();
 	List<String> puertoPeti = new ArrayList<String>();
+	HashMap<String,String> clientes_ubic=new HashMap<String,String>();
 
 	public mainServerThread() throws IOException {
         socket = new DatagramSocket(4445);
@@ -120,6 +121,14 @@ public class mainServerThread extends Thread {
 	    //extraer puerto y direccion
 	    InetAddress address = packet.getAddress();
 	    int port = packet.getPort();
+
+		/**agregar cliente al registro de clientes*/
+		String key = address.getHostAddress() + "," + Integer.toString(port);
+
+		clientes_ubic.put(key,distrito);
+
+		System.out.println(Arrays.asList(clientes_ubic));
+
 		int i;
 		for(i=0;i<distritos.size();i++){
 			//enviar ip del distrito que solicito
