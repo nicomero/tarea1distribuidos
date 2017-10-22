@@ -124,7 +124,7 @@ public class cliente {
         }catch(IOException e) {
                 e.printStackTrace();
         }
-        return "mensajegenerico";
+        return "Fallo";
 	}
 
 }//end class cliente

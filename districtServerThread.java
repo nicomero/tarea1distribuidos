@@ -63,7 +63,11 @@ public class districtServerThread extends Thread {
 	}
 
 	public void run() {
+		inputLocal();
         while (moreQuotes) {
+
+
+
             String dString = new Date().toString();
 
             enviarU(dString+" "+nDistrito, ipMulti, socket);
@@ -88,6 +92,25 @@ public class districtServerThread extends Thread {
             System.out.println("ilprob");
             e.printStackTrace();
         }
+	}
+
+	public void inputLocal(){
+		Thread t = new Thread(new Runnable(){
+			public void run(){
+				Scanner scan = new Scanner(System.in);
+				String input;
+
+				while(true){
+					System.out.println("escoga opcion [Publicar titan]");
+					input = scan.nextLine();
+
+					if(input.equals("Publicar titan")){
+						System.out.println("Todo bien c:");
+					}
+				}
+			}
+		});
+		t.start();
 	}
 
 }//end districtServerThread
