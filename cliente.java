@@ -85,13 +85,43 @@ public class cliente {
 
 			socket = new DatagramSocket();
 
-
 			detectarMulti(socketD);//detecta si hay algo escrito en el multicast
 
+
+			String input;
+
 	        while(masTitan) {//mientras se quieran hacer acciones en el distrito actual
-				enviarU("probando",info.get(3),info.get(4),socket);
-	            System.out.println ("[Cliente] Buscar mas titanes? si/no");
-				masTitan = "si".equals(entradaEscaner.nextLine());
+
+	            System.out.println ("[Cliente] Consola");
+				System.out.println ("[Cliente] (1) Listar Titanes");
+				System.out.println ("[Cliente] (2) Cambiar Distrito");
+				System.out.println ("[Cliente] (3) Capturar Titan");
+				System.out.println ("[Cliente] (4) Asesinar Titan");
+				System.out.println ("[Cliente] (5) Listar Titanes Capturados");
+				System.out.println ("[Cliente] (6) Listar Titanes asesinados");
+
+				input = entradaEscaner.nextLine();
+				if(input.equals("1")){
+					enviarU(input,info.get(3),info.get(4),socket);
+				}
+				else if (input.equals("2")){
+					masTitan = false;
+				}
+				else if (input.equals("3")){
+					enviarU(input,info.get(3),info.get(4),socket);
+				}
+				else if (input.equals("4")){
+					enviarU(input,info.get(3),info.get(4),socket);
+				}
+				else if (input.equals("5")){
+					System.out.println ("[Cliente] Titanes capturados");
+				}
+				else if (input.equals("6")){
+					System.out.println ("[Cliente] Titanes asesinados");
+				}
+				else {
+					System.out.println ("[Cliente] Ingrese algo valido");
+				}
 
 	        }
 
