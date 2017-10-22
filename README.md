@@ -14,6 +14,8 @@ Trost
 230.0.0.1
 [Servidor Central] Puerto Multicast:
 5555
+[Servidor Central] IP Peticiones:
+127.0.0.1
 [Servidor Central] Puerto Peticiones"
 6789
 ¿Desea seguir agregando distritos?[y/n]
@@ -25,6 +27,8 @@ Panchitolandia
 231.0.0.1
 [Servidor Central] Puerto Multicast:
 5556
+[Servidor Central] IP Peticiones:
+127.0.0.1
 [Servidor Central] Puerto Peticiones"
 6788
 ¿Desea seguir agregando distritos?[y/n]
@@ -39,6 +43,8 @@ Trost
 230.0.0.1
 [Distrito Trost] Puerto Multicast:
 5555
+[Servidor Central] IP Peticiones:
+127.0.0.1
 [Distrito Trost] Puerto Peticiones:
 6789
 ```
@@ -51,6 +57,8 @@ Panchitolandia
 231.0.0.1
 [Distrito Trost] Puerto Multicast:
 5556
+[Servidor Central] IP Peticiones:
+127.0.0.1
 [Distrito Trost] Puerto Peticiones:
 6788
 ```

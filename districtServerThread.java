@@ -42,6 +42,7 @@ public class districtServerThread extends Thread {
 	int puerto;
 	String nDistrito = "";
 	String ipMulti = "";
+	String ipPeti = "";
 	String puertoMulti = "";
 	String puertoPeti = "";
 
@@ -56,24 +57,36 @@ public class districtServerThread extends Thread {
 		System.out.println ("[Distrito "+nDistrito+"] Puerto Multicast:");
 		puertoMulti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
 
+		System.out.println ("[Distrito "+nDistrito+"] IP Peticiones:");
+		ipPeti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
 		System.out.println ("[Distrito "+nDistrito+"] Puerto Peticiones:");
 		puertoPeti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
 
-        socket = new DatagramSocket(Integer.parseInt(puertoPeti));
+        socket = new DatagramSocket(Integer.parseInt(puertoPeti), InetAddress.getByName(ipPeti));
 	}
 
 	public void run() {
-        while (moreQuotes) {
-            String dString = new Date().toString();
 
-            enviarU(dString+" "+nDistrito, ipMulti, socket);
+		inputLocal();//funcion que lee desde consola
 
-            // sleep for a while
-            try {
-                sleep((long)(Math.random() * FIVE_SECONDS));
-            } catch (InterruptedException e) { }
-        }
-        socket.close();
+		try{
+			while (moreQuotes) {
+
+				byte[] buf = new byte[256];
+				//Recibir el paquete para determinar lo que el cliente quiere
+				DatagramPacket packet = new DatagramPacket(buf, buf.length);
+				socket.receive(packet);
+
+				String received_D = recibir(packet);//recibir peticiones del cliente
+				System.out.println("mensaje recibido: " + received_D);
+
+	        }
+	        socket.close();
+		}catch(IOException e){
+			System.out.println("run distrito");
+            e.printStackTrace();
+		}
 	}
 
 	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
@@ -85,9 +98,51 @@ public class districtServerThread extends Thread {
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puertoMulti));
             socket.send(packet);
         }catch(IOException e) {
-            System.out.println("ilprob");
+            System.out.println("enviarU Distrito");
             e.printStackTrace();
         }
+	}
+
+	public void inputLocal(){	//funcion que se encarga de leer de consola
+		Thread t = new Thread(new Runnable(){
+			public void run(){
+
+
+				Scanner scan = new Scanner(System.in);
+				String input;
+				try{
+					DatagramSocket socket_multi = new DatagramSocket();
+
+
+
+					while(true){
+
+						String dString = new Date().toString();
+
+						System.out.println("escoga opcion [Publicar titan]");
+						input = scan.nextLine();
+
+						if(input.equals("Publicar titan")){
+							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
+							System.out.println("Todo bien c:");
+						}
+					}
+				}catch(IOException e){
+					System.out.println("inputLocal Distrito");
+					e.printStackTrace();
+				}
+				//socket.close();
+			}
+		});
+		t.start();
+	}
+
+	//recibe un mensaje en formato string para retornarlo
+	public String recibir(DatagramPacket packet){
+
+	    // display response
+	    String received = new String(packet.getData(), 0, packet.getLength());
+	    return received;
 	}
 
 }//end districtServerThread
