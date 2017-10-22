@@ -101,25 +101,33 @@ public class cliente {
 				System.out.println ("[Cliente] (6) Listar Titanes asesinados");
 
 				input = entradaEscaner.nextLine();
-				if(input.equals("1")){
+
+				if(input.equals("1")){//Listar titanes
+
 					enviarU(input,info.get(3),info.get(4),socket);
+					input=recibir(socket);
+					System.out.println ("[Cliente] Lo que llego fue:--" + input);
 				}
-				else if (input.equals("2")){
+				else if (input.equals("2")){//cambiar distrito
 					masTitan = false;
 				}
-				else if (input.equals("3")){
+				else if (input.equals("3")){//Capturar titan
 					enviarU(input,info.get(3),info.get(4),socket);
+					input=recibir(socket);
+					System.out.println ("[Cliente] Lo que llego fue:--" + input);
 				}
-				else if (input.equals("4")){
+				else if (input.equals("4")){//Asesinar titan
 					enviarU(input,info.get(3),info.get(4),socket);
+					input=recibir(socket);
+					System.out.println ("[Cliente] Lo que llego fue:--" + input);
 				}
-				else if (input.equals("5")){
+				else if (input.equals("5")){//Listar titanes capturados
 					System.out.println ("[Cliente] Titanes capturados");
 				}
-				else if (input.equals("6")){
+				else if (input.equals("6")){//Listar titanes asesinados
 					System.out.println ("[Cliente] Titanes asesinados");
 				}
-				else {
+				else {//
 					System.out.println ("[Cliente] Ingrese algo valido");
 				}
 
