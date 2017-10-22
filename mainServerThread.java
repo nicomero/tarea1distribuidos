@@ -74,9 +74,9 @@ public class mainServerThread extends Thread {
 					System.out.println ("[Servidor Central] Puerto Multicast:");
 				   	puertoM = entradaEscaner.nextLine ();
 
-					//System.out.println ("[Servidor Central] IP Peticiones:");
-					ipP = "test";
-					//ipP = entradaEscaner.nextLine ();
+					System.out.println ("[Servidor Central] IP Peticiones:");
+					//ipP = "test";
+					ipP = entradaEscaner.nextLine ();
 
 					System.out.println ("[Servidor Central] Puerto Peticiones:");
 				   	puertoP = entradaEscaner.nextLine ();
@@ -151,6 +151,7 @@ public class mainServerThread extends Thread {
 	        DatagramPacket packet = new DatagramPacket(buf, buf.length, ip_destino, port);
 	        socket.send(packet);
 	    }catch(IOException e) {
+			System.out.println("enviarU main");
 	        e.printStackTrace();
 	    }
 	}

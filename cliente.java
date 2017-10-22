@@ -83,10 +83,13 @@ public class cliente {
 	        InetAddress address = InetAddress.getByName(info.get(1));
 	        socketD.joinGroup(address);
 
+			socket = new DatagramSocket();
+
 
 			detectarMulti(socketD);//detecta si hay algo escrito en el multicast
 
 	        while(masTitan) {
+				enviarU("probando",info.get(3),info.get(4),socket);
 	            System.out.println ("[Cliente] Buscar mas titanes? si/no");
 				masTitan = "si".equals(entradaEscaner.nextLine());
 
@@ -94,6 +97,7 @@ public class cliente {
 
 	        socketD.leaveGroup(address);
 	        socketD.close();
+			socket.close();
 		}
 	}
 
@@ -102,12 +106,12 @@ public class cliente {
 
         try{
             byte[] buf = new byte[256];
-
             InetAddress address = InetAddress.getByName(ip_destino);
             buf = mensaje.getBytes();
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino)); //viene con puerto de defecto
             socket.send(packet);
         }catch(IOException e) {
+			System.out.println("enviarU cliente");
             e.printStackTrace();
         }
 	}
@@ -123,6 +127,7 @@ public class cliente {
             String received = new String(packet.getData(), 0, packet.getLength());
             return received;
         }catch(IOException e) {
+				System.out.println("recibir cliente");
                 e.printStackTrace();
         }
         return "Fallo";
