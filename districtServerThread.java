@@ -83,6 +83,16 @@ public class districtServerThread extends Thread {
 				String received_D = recibir(packet);//recibir peticiones del cliente
 				System.out.println("mensaje recibido: " + received_D);
 
+				if (received_D.equals("1")){//cliente quiere ver titanes
+					enviarC("lista de titanes",packet ,socket);
+				}
+				else if (received_D.equals("3")){//cliente quiere capturar titanes
+					enviarC("info titan capturado",packet ,socket);
+				}
+				else if (received_D.equals("4")){//cliente quiere matar titanes
+					enviarC("info titan muerto",packet ,socket);
+				}
+
 	        }
 	        socket.close();
 		}catch(IOException e){
@@ -91,7 +101,7 @@ public class districtServerThread extends Thread {
 		}
 	}
 
-	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
+	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){//enviar mensajes a multicast
         try{
             byte[] buf = new byte[256];
 
@@ -104,6 +114,23 @@ public class districtServerThread extends Thread {
             e.printStackTrace();
         }
 	}
+
+	public void enviarC(String mensaje, DatagramPacket packet, DatagramSocket socket){//enviar mensajes a cliente
+		try{
+			byte[] buf = new byte[256];
+			//extraer puerto y direccion
+			InetAddress address = packet.getAddress();
+			int port = packet.getPort();
+
+			buf = mensaje.getBytes();
+			DatagramPacket paquete = new DatagramPacket(buf, buf.length, address, port);
+			socket.send(paquete);
+		}catch(IOException e) {
+			System.out.println("enviarU Distrito");
+			e.printStackTrace();
+		}
+	}
+
 
 	public void inputLocal(){	//funcion que se encarga de leer de consola
 		Thread t = new Thread(new Runnable(){
