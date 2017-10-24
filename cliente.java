@@ -43,6 +43,7 @@ public class cliente {
 		String ipServer = "";
 		String puertoServer = "";
 		String nDistrito = "";
+		boolean otroDist = true;
 
 		System.out.println ("[Cliente] Ingresar IP Servidor Central:");
 		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
@@ -51,38 +52,91 @@ public class cliente {
 		System.out.println ("[Cliente] Ingresar Puerto Servidor Central:");
 		puertoServer = entradaEscaner.nextLine ();
 
-		System.out.println ("[Cliente] Introducir Nombre de Distrito a Investigar:");
-		nDistrito = entradaEscaner.nextLine ();
 
-        // get a datagram socket
-        DatagramSocket socket = new DatagramSocket();
-        // send request
-        enviarU(nDistrito, ipServer, puertoServer, socket);
+		while(otroDist){ //mientras quiera mas distritos
 
-        // get response
-        String received = recibir(socket);
-		//[NombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
-		List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
-		System.out.println(info);
-        // cerrar socket
-        socket.close();
+			boolean masTitan = true;
 
-		//======================================================
-        //	CONECTARSE AL SERVIDOR DE UN DISTRITO
-		//======================================================
 
-		//puerto conexión multicast
-        MulticastSocket socketD = new MulticastSocket(Integer.parseInt(info.get(2)));
-        InetAddress address = InetAddress.getByName(info.get(1));
-        socketD.joinGroup(address);
+			System.out.println ("[Cliente] Introducir Nombre de Distrito a Investigar:");
+			nDistrito = entradaEscaner.nextLine ();
 
-        for (int i = 0; i < 5; i++) {
-            String received_D = recibir(socketD);
-            System.out.println("Date: " + received_D);
-        }
+	        // get a datagram socket
+	        DatagramSocket socket = new DatagramSocket();
+	        // send request
+	        enviarU(nDistrito, ipServer, puertoServer, socket);
 
-        socketD.leaveGroup(address);
-        socketD.close();
+	        // get response
+	        String received = recibir(socket);
+			//[NombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
+			List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
+			System.out.println(info);
+	        // cerrar socket
+	        socket.close();
+
+			//======================================================
+	        //	CONECTARSE AL SERVIDOR DE UN DISTRITO
+			//======================================================
+
+			//puerto conexión multicast
+	        MulticastSocket socketD = new MulticastSocket(Integer.parseInt(info.get(2)));
+	        InetAddress address = InetAddress.getByName(info.get(1));
+	        socketD.joinGroup(address);
+
+			socket = new DatagramSocket();
+
+			detectarMulti(socketD);//detecta si hay algo escrito en el multicast
+
+
+			String input;
+
+	        while(masTitan) {//mientras se quieran hacer acciones en el distrito actual
+
+	            System.out.println ("[Cliente] Consola");
+				System.out.println ("[Cliente] (1) Listar Titanes");
+				System.out.println ("[Cliente] (2) Cambiar Distrito");
+				System.out.println ("[Cliente] (3) Capturar Titan");
+				System.out.println ("[Cliente] (4) Asesinar Titan");
+				System.out.println ("[Cliente] (5) Listar Titanes Capturados");
+				System.out.println ("[Cliente] (6) Listar Titanes asesinados");
+
+				input = entradaEscaner.nextLine();
+
+				if(input.equals("1")){//Listar titanes
+
+					enviarU(input,info.get(3),info.get(4),socket);
+					input=recibir(socket);
+					System.out.println ("[Cliente] Lo que llego fue:--" + input);
+				}
+				else if (input.equals("2")){//cambiar distrito
+					masTitan = false;
+				}
+				else if (input.equals("3")){//Capturar titan
+					enviarU(input,info.get(3),info.get(4),socket);
+					input=recibir(socket);
+					System.out.println ("[Cliente] Lo que llego fue:--" + input);
+				}
+				else if (input.equals("4")){//Asesinar titan
+					enviarU(input,info.get(3),info.get(4),socket);
+					input=recibir(socket);
+					System.out.println ("[Cliente] Lo que llego fue:--" + input);
+				}
+				else if (input.equals("5")){//Listar titanes capturados
+					System.out.println ("[Cliente] Titanes capturados");
+				}
+				else if (input.equals("6")){//Listar titanes asesinados
+					System.out.println ("[Cliente] Titanes asesinados");
+				}
+				else {//
+					System.out.println ("[Cliente] Ingrese algo valido");
+				}
+
+	        }
+
+	        socketD.leaveGroup(address);
+	        socketD.close();
+			socket.close();
+		}
 	}
 
 	//envia un mensaje a la ip dada por cierto socket
@@ -90,12 +144,12 @@ public class cliente {
 
         try{
             byte[] buf = new byte[256];
-
             InetAddress address = InetAddress.getByName(ip_destino);
             buf = mensaje.getBytes();
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino)); //viene con puerto de defecto
             socket.send(packet);
         }catch(IOException e) {
+			System.out.println("enviarU cliente");
             e.printStackTrace();
         }
 	}
@@ -110,10 +164,28 @@ public class cliente {
             // display response
             String received = new String(packet.getData(), 0, packet.getLength());
             return received;
-        }catch(IOException e) {
-                e.printStackTrace();
-        }
-        return "mensajegenerico";
+        }catch(IOException e) {}
+        return "Fallo";
+	}
+
+	public static void detectarMulti(MulticastSocket socketD){
+		Thread t = new Thread(new Runnable(){
+
+			public void run(){
+
+				boolean flag = false; //indica si hay fallo en el socket
+
+				while(!flag){//mientras NO halla fallo en el socket
+
+					String received_D = recibir(socketD);
+					flag = received_D.equals("Fallo");
+					if (!flag){
+						System.out.println("Date: " + received_D);
+					}
+				}
+			}
+		});
+		t.start();
 	}
 
 }//end class cliente

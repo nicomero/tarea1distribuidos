@@ -43,6 +43,7 @@ public class mainServerThread extends Thread {
 	List<String> puertoMulti = new ArrayList<String>();
 	List<String> ipPeti = new ArrayList<String>();
 	List<String> puertoPeti = new ArrayList<String>();
+	HashMap<String,String> clientes_ubic=new HashMap<String,String>();
 
 	public mainServerThread() throws IOException {
         socket = new DatagramSocket(4445);
@@ -73,9 +74,9 @@ public class mainServerThread extends Thread {
 					System.out.println ("[Servidor Central] Puerto Multicast:");
 				   	puertoM = entradaEscaner.nextLine ();
 
-					//System.out.println ("[Servidor Central] IP Peticiones:");
-					ipP = "test";
-					//ipP = entradaEscaner.nextLine ();
+					System.out.println ("[Servidor Central] IP Peticiones:");
+					//ipP = "test";
+					ipP = entradaEscaner.nextLine ();
 
 					System.out.println ("[Servidor Central] Puerto Peticiones:");
 				   	puertoP = entradaEscaner.nextLine ();
@@ -93,6 +94,9 @@ public class mainServerThread extends Thread {
 						seguir = !seguir;
 					}
 				}//end while
+
+
+				/////*****EN ESTA PARTE SE INTERACTUA CON CLIENTES *****//////
 
 				while(true){
 					byte[] buf = new byte[256];
@@ -115,11 +119,19 @@ public class mainServerThread extends Thread {
 	    socket.close();
 	}
 
-	//enviar ip multicast
+	//enviar ip multicast a clientes
 	public void enviarIp_multi(String distrito, DatagramPacket packet){
 	    //extraer puerto y direccion
 	    InetAddress address = packet.getAddress();
 	    int port = packet.getPort();
+
+		/**agregar cliente al registro de clientes*/
+		String key = address.getHostAddress() + "," + Integer.toString(port);
+
+		clientes_ubic.put(key,distrito);
+
+		System.out.println(Arrays.asList(clientes_ubic));
+
 		int i;
 		for(i=0;i<distritos.size();i++){
 			//enviar ip del distrito que solicito
@@ -142,6 +154,7 @@ public class mainServerThread extends Thread {
 	        DatagramPacket packet = new DatagramPacket(buf, buf.length, ip_destino, port);
 	        socket.send(packet);
 	    }catch(IOException e) {
+			System.out.println("enviarU main");
 	        e.printStackTrace();
 	    }
 	}
