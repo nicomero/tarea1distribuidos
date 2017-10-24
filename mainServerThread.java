@@ -37,7 +37,7 @@ public class mainServerThread extends Thread {
 
 	protected DatagramSocket socket = null;
 	protected BufferedReader in = null;
-	protected boolean moreQuotes = true;
+	protected boolean more = true;
 	List<String> distritos = new ArrayList<String>();
 	List<String> ipMulti = new ArrayList<String>();
 	List<String> puertoMulti = new ArrayList<String>();
@@ -50,9 +50,9 @@ public class mainServerThread extends Thread {
 	}
 
 	public void run() {
-	    while (moreQuotes) {
+	    while (more) {
 	        try {
-				//
+
 				String nDistrito = "";
 				String ipM = "";
 				String puertoM = "";
@@ -95,7 +95,6 @@ public class mainServerThread extends Thread {
 					}
 				}//end while
 
-
 				/////*****EN ESTA PARTE SE INTERACTUA CON CLIENTES *****//////
 
 				while(true){
@@ -109,15 +108,15 @@ public class mainServerThread extends Thread {
 
 		            //en caso de que quiera ip multicast
 		            enviarIp_multi(received_D, packet);
-				}
+				}//end while
 
 	        } catch (IOException e) {
 	            e.printStackTrace();
-	            moreQuotes = false;
+	            more = false;
 	        }
 	    }
 	    socket.close();
-	}
+	}//end run
 
 	//enviar ip multicast a clientes
 	public void enviarIp_multi(String distrito, DatagramPacket packet){
@@ -134,8 +133,9 @@ public class mainServerThread extends Thread {
 
 		int i;
 		for(i=0;i<distritos.size();i++){
-			//enviar ip del distrito que solicito
+			//Verifica que el distrito que está pidiendo se encuentra en el servidor central.
 			if(distritos.get(i).equals(distrito)){
+				//enviar ip del distrito que solicito
 				//[nombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
 				enviarU(distrito+","+ipMulti.get(i)+","+puertoMulti.get(i)+","+ipPeti.get(i)+","+puertoPeti.get(i), address, port);
 				return;

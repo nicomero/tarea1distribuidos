@@ -38,7 +38,7 @@ public class districtServerThread extends Thread {
 	private long FIVE_SECONDS = 5000;
 	protected DatagramSocket socket = null;
 	protected BufferedReader in = null;
-	protected boolean moreQuotes = true;
+	protected boolean more = true;
 	HashMap<Integer,String> titanes=new HashMap<Integer,String>();
 	int id = 0;
 	int puerto;
@@ -73,7 +73,7 @@ public class districtServerThread extends Thread {
 		inputLocal();//funcion que lee desde consola
 
 		try{
-			while (moreQuotes) {
+			while (more) {
 
 				byte[] buf = new byte[256];
 				//Recibir el paquete para determinar lo que el cliente quiere
@@ -84,13 +84,13 @@ public class districtServerThread extends Thread {
 				System.out.println("mensaje recibido: " + received_D);
 
 				if (received_D.equals("1")){//cliente quiere ver titanes
-					enviarC("lista de titanes",packet ,socket);
+					enviarC("Lista de titanes",packet ,socket);
 				}
 				else if (received_D.equals("3")){//cliente quiere capturar titanes
-					enviarC("info titan capturado",packet ,socket);
+					enviarC("Info titan capturado",packet ,socket);
 				}
 				else if (received_D.equals("4")){//cliente quiere matar titanes
-					enviarC("info titan muerto",packet ,socket);
+					enviarC("Info titan muerto",packet ,socket);
 				}
 
 	        }
@@ -101,7 +101,8 @@ public class districtServerThread extends Thread {
 		}
 	}
 
-	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){//enviar mensajes a multicast
+	//enviar mensajes a multicast
+	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
         try{
             byte[] buf = new byte[256];
 
@@ -115,7 +116,8 @@ public class districtServerThread extends Thread {
         }
 	}
 
-	public void enviarC(String mensaje, DatagramPacket packet, DatagramSocket socket){//enviar mensajes a cliente
+	//enviar mensajes a cliente
+	public void enviarC(String mensaje, DatagramPacket packet, DatagramSocket socket){
 		try{
 			byte[] buf = new byte[256];
 			//extraer puerto y direccion
@@ -131,24 +133,20 @@ public class districtServerThread extends Thread {
 		}
 	}
 
-
 	public void inputLocal(){	//funcion que se encarga de leer de consola
 		Thread t = new Thread(new Runnable(){
 			public void run(){
-
 
 				Scanner scan = new Scanner(System.in);
 				String input;
 				try{
 					DatagramSocket socket_multi = new DatagramSocket();
 
-
-
 					while(true){
 
 						String dString = new Date().toString();
 
-						System.out.println("escoga opcion [Publicar titan]");
+						System.out.println("Escoja opcion [Publicar titan]");
 						input = scan.nextLine();
 
 						if(input.equals("Publicar titan")){
@@ -157,6 +155,9 @@ public class districtServerThread extends Thread {
 							System.out.println(Arrays.asList(titanes));
 
 							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
+						}
+						else{
+							System.out.println("Ingrese mensaje valido");
 						}
 					}
 				}catch(IOException e){

@@ -52,21 +52,18 @@ public class cliente {
 		System.out.println ("[Cliente] Ingresar Puerto Servidor Central:");
 		puertoServer = entradaEscaner.nextLine ();
 
-
-		while(otroDist){ //mientras quiera mas distritos
+		while(otroDist){ //mientras quiera más distritos
 
 			boolean masTitan = true;
-
 
 			System.out.println ("[Cliente] Introducir Nombre de Distrito a Investigar:");
 			nDistrito = entradaEscaner.nextLine ();
 
-	        // get a datagram socket
+	        //Envía solicitud de info Multicast al servidor central
 	        DatagramSocket socket = new DatagramSocket();
-	        // send request
 	        enviarU(nDistrito, ipServer, puertoServer, socket);
 
-	        // get response
+	        //Recibe la información del distrito
 	        String received = recibir(socket);
 			//[NombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
 			List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
@@ -79,14 +76,14 @@ public class cliente {
 			//======================================================
 
 			//puerto conexión multicast
+			//info.get(2)=puerto multicast distrito
+			//info.get(1)=ip multicast distrito
 	        MulticastSocket socketD = new MulticastSocket(Integer.parseInt(info.get(2)));
 	        InetAddress address = InetAddress.getByName(info.get(1));
 	        socketD.joinGroup(address);
 
 			socket = new DatagramSocket();
-
 			detectarMulti(socketD);//detecta si hay algo escrito en el multicast
-
 
 			String input;
 
@@ -98,12 +95,13 @@ public class cliente {
 				System.out.println ("[Cliente] (3) Capturar Titan");
 				System.out.println ("[Cliente] (4) Asesinar Titan");
 				System.out.println ("[Cliente] (5) Listar Titanes Capturados");
-				System.out.println ("[Cliente] (6) Listar Titanes asesinados");
+				System.out.println ("[Cliente] (6) Listar Titanes Asesinados");
 
 				input = entradaEscaner.nextLine();
+				//info.get(3)=IP Peticiones
+				//info.get(4)=Puerto Peticionoes
 
 				if(input.equals("1")){//Listar titanes
-
 					enviarU(input,info.get(3),info.get(4),socket);
 					input=recibir(socket);
 					System.out.println ("[Cliente] Lo que llego fue:--" + input);
@@ -127,16 +125,15 @@ public class cliente {
 				else if (input.equals("6")){//Listar titanes asesinados
 					System.out.println ("[Cliente] Titanes asesinados");
 				}
-				else {//
+				else {
 					System.out.println ("[Cliente] Ingrese algo valido");
 				}
-
 	        }
 
 	        socketD.leaveGroup(address);
 	        socketD.close();
 			socket.close();
-		}
+		}//end while
 	}
 
 	//envia un mensaje a la ip dada por cierto socket
@@ -146,7 +143,7 @@ public class cliente {
             byte[] buf = new byte[256];
             InetAddress address = InetAddress.getByName(ip_destino);
             buf = mensaje.getBytes();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino)); //viene con puerto de defecto
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino));
             socket.send(packet);
         }catch(IOException e) {
 			System.out.println("enviarU cliente");
