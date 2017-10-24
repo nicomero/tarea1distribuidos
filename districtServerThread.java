@@ -70,35 +70,12 @@ public class districtServerThread extends Thread {
 
 	public void run() {
 
-		inputLocal();//funcion que lee desde consola
+		//funcion que lee desde consola
+		inputLocal();
 
-		try{
-			while (more) {
+		//Escucha las instrucciones que da el cliente
+		escucharCliente(socket);
 
-				byte[] buf = new byte[256];
-				//Recibir el paquete para determinar lo que el cliente quiere
-				DatagramPacket packet = new DatagramPacket(buf, buf.length);
-				socket.receive(packet);
-
-				String received_D = recibir(packet);//recibir peticiones del cliente
-				System.out.println("mensaje recibido: " + received_D);
-
-				if (received_D.equals("1")){//cliente quiere ver titanes
-					enviarC("Lista de titanes",packet ,socket);
-				}
-				else if (received_D.equals("3")){//cliente quiere capturar titanes
-					enviarC("Info titan capturado",packet ,socket);
-				}
-				else if (received_D.equals("4")){//cliente quiere matar titanes
-					enviarC("Info titan muerto",packet ,socket);
-				}
-
-	        }
-	        socket.close();
-		}catch(IOException e){
-			System.out.println("run distrito");
-            e.printStackTrace();
-		}
 	}
 
 	//enviar mensajes a multicast
@@ -128,7 +105,35 @@ public class districtServerThread extends Thread {
 			DatagramPacket paquete = new DatagramPacket(buf, buf.length, address, port);
 			socket.send(paquete);
 		}catch(IOException e) {
-			System.out.println("enviarU Distrito");
+			System.out.println("enviarC Distrito");
+			e.printStackTrace();
+		}
+	}
+
+	public void escucharCliente(DatagramSocket socket){
+		try{
+			while (more) {
+				byte[] buf = new byte[256];
+				//Recibir el paquete para determinar lo que el cliente quiere
+				DatagramPacket packet = new DatagramPacket(buf, buf.length);
+				socket.receive(packet);
+
+				String received_D = recibir(packet);//recibir peticiones del cliente
+				System.out.println("mensaje recibido: " + received_D);
+
+				if (received_D.equals("1")){//cliente quiere ver titanes
+					enviarC("Lista de titanes",packet ,socket);
+				}
+				else if (received_D.equals("3")){//cliente quiere capturar titanes
+					enviarC("Info titan capturado",packet ,socket);
+				}
+				else if (received_D.equals("4")){//cliente quiere matar titanes
+					enviarC("Info titan muerto",packet ,socket);
+				}
+			}
+			socket.close();
+		}catch(IOException e){
+			System.out.println("run distrito");
 			e.printStackTrace();
 		}
 	}

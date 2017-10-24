@@ -67,7 +67,7 @@ public class cliente {
 	        String received = recibir(socket);
 			//[NombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
 			List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
-			System.out.println(info);
+			System.out.println("info distrito: "+info);
 	        // cerrar socket
 	        socket.close();
 

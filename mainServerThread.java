@@ -127,7 +127,9 @@ public class mainServerThread extends Thread {
 		/**agregar cliente al registro de clientes*/
 		String key = address.getHostAddress() + "," + Integer.toString(port);
 
-		clientes_ubic.put(key,distrito);
+		if(distritos.contains(distrito)){
+			clientes_ubic.put(key,distrito);
+		}
 
 		System.out.println(Arrays.asList(clientes_ubic));
 
