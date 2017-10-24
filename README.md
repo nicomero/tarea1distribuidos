@@ -43,7 +43,7 @@ Trost
 230.0.0.1
 [Distrito Trost] Puerto Multicast:
 5555
-[Servidor Central] IP Peticiones:
+[Servidor Trost] IP Peticiones:
 127.0.0.1
 [Distrito Trost] Puerto Peticiones:
 6789
@@ -57,7 +57,7 @@ Panchitolandia
 231.0.0.1
 [Distrito Trost] Puerto Multicast:
 5556
-[Servidor Central] IP Peticiones:
+[Servidor Trost] IP Peticiones:
 127.0.0.1
 [Distrito Trost] Puerto Peticiones:
 6788
