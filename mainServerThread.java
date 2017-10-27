@@ -53,13 +53,21 @@ public class mainServerThread extends Thread {
 	String yn = "";
 	boolean seguir = true;
 
+	int idsTitanes = 0;
+
 	public mainServerThread() throws IOException {
         socket = new DatagramSocket(4445);
 	}
 
+	//--------------------------------------------------------------------------
+
 	public void run() {
 	    while (more) {
 	        try {
+
+				//======================================================
+				//	AGREGA DISTRITOS INICIALES
+				//======================================================
 
 				agregarDistritos();
 
@@ -74,10 +82,19 @@ public class mainServerThread extends Thread {
 		            socket.receive(packet);
 
 		            String received_D = recibir(packet);
-		            System.out.println("Pidiendo distrito: " + received_D);
-
-		            //en caso de que quiera ip multicast
-		            enviarIp_multi(received_D, packet);
+					if(received_D.equals("Xba1SS7lbAXmMe09aE12X2x")){
+						System.out.println("Pidiendo ids titanes:");
+			            //Se envía id titan a distrito
+						InetAddress address = packet.getAddress();
+						int port = packet.getPort();
+			            enviarU(String.valueOf(idsTitanes), address, port);
+						idsTitanes += 1;
+					}
+					else{
+						System.out.println("Pidiendo distrito: " + received_D);
+						//en caso de que quiera ip multicast
+						enviarIp_multi(received_D, packet);
+					}
 				}//end while
 
 	        } catch (IOException e) {
@@ -87,6 +104,8 @@ public class mainServerThread extends Thread {
 	    }
 	    socket.close();
 	}//end run
+
+	//--------------------------------------------------------------------------
 
 	public void agregarDistritos(){
 		while(seguir){
@@ -156,7 +175,6 @@ public class mainServerThread extends Thread {
 	public void enviarU(String mensaje, InetAddress ip_destino, int port){
 	    try{
 	        byte[] buf = new byte[256];
-
 	        buf = mensaje.getBytes();
 	        DatagramPacket packet = new DatagramPacket(buf, buf.length, ip_destino, port);
 	        socket.send(packet);

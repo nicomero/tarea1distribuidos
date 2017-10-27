@@ -35,6 +35,8 @@ import java.util.*;
 
 public class cliente {
 
+	//--------------------------------------------------------------------------
+
 	public static void main(String[] args) throws IOException {
 		//======================================================
         //	CONECTARSE AL MAIN SERVER
@@ -85,14 +87,16 @@ public class cliente {
 	        InetAddress address = InetAddress.getByName(info.get(1));
 	        socketD.joinGroup(address);
 
-			detectarMulti(socketD);//detecta si hay algo escrito en el multicast
+			detectarMulti(socketD);//detecta si hay algo escrito en el multicast mediante thread
 
-			interfazCliente(socket, info, entradaScanner);
+			interfazCliente(socket, info, entradaScanner);//muestra la interfaz al cliente
 
 	        socketD.leaveGroup(address);
 	        socketD.close();
 		}//end while
 	}
+
+	//--------------------------------------------------------------------------
 
 	public static void interfazCliente(DatagramSocket socket, List<String> info, Scanner entradaScanner){
 		String input;

@@ -40,13 +40,13 @@ public class districtServerThread extends Thread {
 	protected BufferedReader in = null;
 	protected boolean more = true;
 	HashMap<Integer,String> titanes=new HashMap<Integer,String>();
-	int id = 0;
 	int puerto;
 	String nDistrito = "";
 	String ipMulti = "";
 	String ipPeti = "";
 	String puertoMulti = "";
 	String puertoPeti = "";
+	String claveSecreta = "Xba1SS7lbAXmMe09aE12X2x";
 
 	public districtServerThread() throws IOException {
 		System.out.println ("[Distrito] Nombre Distrito:");
@@ -92,9 +92,7 @@ public class districtServerThread extends Thread {
 						input = scan.nextLine();
 
 						if(input.equals("Publicar titan")){
-
 							crearTitan();
-							System.out.println(Arrays.asList(titanes));
 
 							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
 						}
@@ -180,17 +178,48 @@ public class districtServerThread extends Thread {
 	    return received;
 	}
 
+	//recibe un mensaje del socket
+	public static String recibirSocket(DatagramSocket socket){
+        try{
+            byte[] buf = new byte[256];
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            socket.receive(packet);
+
+            // display response
+            String received = new String(packet.getData(), 0, packet.getLength());
+            return received;
+        }catch(IOException e) {}
+        return "Fallo";
+	}
+
 	public void crearTitan(){
+		try{
+			socket = new DatagramSocket();
 
-		Scanner scan = new Scanner(System.in);
-		String input;
+			Scanner scan = new Scanner(System.in);
+			String input;
 
-		System.out.println("Escoga nombre");
-		input = scan.nextLine();
-		System.out.println("Escoga tipo");
-		input = input + "," +scan.nextLine();
-		titanes.put(id, input);
-		id = id+1;
+			System.out.println("Escoga nombre");
+			input = scan.nextLine();
+			System.out.println("Escoga tipo");
+			input = input + "," +scan.nextLine();
+
+			byte[] buf = new byte[256];
+			InetAddress address = InetAddress.getByName("127.0.0.1");
+			String puerto_destino = "4445";
+			buf = claveSecreta.getBytes();
+			DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino));
+			socket.send(packet);
+
+			String id = recibirSocket(socket);
+
+			titanes.put(Integer.parseInt(id), input);
+
+			System.out.println(Arrays.asList(titanes));
+		}catch(IOException e) {
+			System.out.println("enviarC Distrito");
+			e.printStackTrace();
+		}	
 
 	}
 
