@@ -91,7 +91,6 @@ public class mainServerThread extends Thread {
 						idsTitanes += 1;
 					}
 					else{
-						System.out.println("Pidiendo distrito: " + received_D);
 						//en caso de que quiera ip multicast
 						enviarIp_multi(received_D, packet);
 					}
@@ -161,9 +160,23 @@ public class mainServerThread extends Thread {
 		for(i=0;i<distritos.size();i++){
 			//Verifica que el distrito que está pidiendo se encuentra en el servidor central.
 			if(distritos.get(i).equals(distrito)){
-				//enviar ip del distrito que solicito
-				//[nombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
-				enviarU(distrito+","+ipMulti.get(i)+","+puertoMulti.get(i)+","+ipPeti.get(i)+","+puertoPeti.get(i), address, port);
+				String respuesta = "";
+				Scanner entradaScanner = new Scanner (System.in);
+				System.out.println("[Servidor Central] ¿Dar autorización a " + address + " por Distrito " + distrito + "?");
+				System.out.println("1.- SI");
+				System.out.println("2.- NO");
+				respuesta = entradaScanner.nextLine ();
+
+				if(respuesta.equals("1")){
+					//enviar ip del distrito que solicito
+					//[nombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
+					enviarU(distrito+","+ipMulti.get(i)+","+puertoMulti.get(i)+","+ipPeti.get(i)+","+puertoPeti.get(i), address, port);
+					System.out.print("Nombre: "+distrito);
+					System.out.print(", IP Multicast: "+ipMulti.get(i));
+					System.out.print(", Puerto Multicast: "+puertoMulti.get(i));
+					System.out.print(", IP Peticiones: "+ipPeti.get(i));
+					System.out.println(", Puerto Peticiones: "+puertoPeti.get(i));
+				}
 				return;
 			}
 		}

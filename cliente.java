@@ -74,7 +74,7 @@ public class cliente {
 	        String received = recibir(socket);
 			//[NombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
 			List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
-			System.out.println("info distrito: "+info);
+			System.out.println("BORRAR: info distrito: "+info);
 
 			//======================================================
 	        //	CONECTARSE AL SERVIDOR DE UN DISTRITO
