@@ -1,7 +1,4 @@
 # tarea1distribuidos
-localhost: 127.0.0.1
-multicast: 230.0.0.1
-
 Nicolas Alarcon
 Rodrigo Elicer
 
@@ -37,13 +34,17 @@ n
 
 * Abrir districtServer 1
 ```
+[Distrito] Ingresar IP Servidor Central:
+127.0.0.1
+[Distrito] Ingresar Puerto Servidor Central:
+4445
 [Distrito] Nombre Distrito:
 Trost
 [Distrito Trost] IP Multicast:
 230.0.0.1
 [Distrito Trost] Puerto Multicast:
 5555
-[Servidor Central] IP Peticiones:
+[Servidor Trost] IP Peticiones:
 127.0.0.1
 [Distrito Trost] Puerto Peticiones:
 6789
@@ -51,15 +52,19 @@ Trost
 
 * Abrir districtServer 2
 ```
+[Distrito] Ingresar IP Servidor Central:
+127.0.0.1
+[Distrito] Ingresar Puerto Servidor Central:
+4445
 [Distrito] Nombre Distrito:
 Panchitolandia
-[Distrito Trost] IP Multicast:
+[Distrito Panchitolandia] IP Multicast:
 231.0.0.1
-[Distrito Trost] Puerto Multicast:
+[Distrito Panchitolandia] Puerto Multicast:
 5556
-[Servidor Central] IP Peticiones:
+[Servidor Panchitolandia] IP Peticiones:
 127.0.0.1
-[Distrito Trost] Puerto Peticiones:
+[Distrito Panchitolandia] Puerto Peticiones:
 6788
 ```
 

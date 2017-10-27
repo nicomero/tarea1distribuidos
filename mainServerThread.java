@@ -37,7 +37,7 @@ public class mainServerThread extends Thread {
 
 	protected DatagramSocket socket = null;
 	protected BufferedReader in = null;
-	protected boolean moreQuotes = true;
+	protected boolean more = true;
 	List<String> distritos = new ArrayList<String>();
 	List<String> ipMulti = new ArrayList<String>();
 	List<String> puertoMulti = new ArrayList<String>();
@@ -45,58 +45,35 @@ public class mainServerThread extends Thread {
 	List<String> puertoPeti = new ArrayList<String>();
 	HashMap<String,String> clientes_ubic=new HashMap<String,String>();
 
+	String nDistrito = "";
+	String ipM = "";
+	String puertoM = "";
+	String ipP = "";
+	String puertoP = "";
+	String yn = "";
+	boolean seguir = true;
+
+	int idsTitanes = 0;
+
 	public mainServerThread() throws IOException {
         socket = new DatagramSocket(4445);
 	}
 
+	//--------------------------------------------------------------------------
+
 	public void run() {
-	    while (moreQuotes) {
+	    while (more) {
 	        try {
-				//
-				String nDistrito = "";
-				String ipM = "";
-				String puertoM = "";
-				String ipP = "";
-				String puertoP = "";
-				String yn = "";
-				boolean seguir = true;
 
-				//Seguir preguntando por distritos a agregar
-				while(seguir){
-					System.out.println("AGREGAR DISTRITO");
-					System.out.println ("[Servidor Central] Nombre Distrito:");
-				   	Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
-				   	nDistrito = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+				//======================================================
+				//	AGREGA DISTRITOS INICIALES
+				//======================================================
 
-					System.out.println ("[Servidor Central] IP Multicast:");
-				   	ipM = entradaEscaner.nextLine ();
+				agregarDistritos();
 
-					System.out.println ("[Servidor Central] Puerto Multicast:");
-				   	puertoM = entradaEscaner.nextLine ();
-
-					System.out.println ("[Servidor Central] IP Peticiones:");
-					//ipP = "test";
-					ipP = entradaEscaner.nextLine ();
-
-					System.out.println ("[Servidor Central] Puerto Peticiones:");
-				   	puertoP = entradaEscaner.nextLine ();
-
-					distritos.add(nDistrito);
-					ipMulti.add(ipM);
-					puertoMulti.add(puertoM);
-					ipPeti.add(ipP);
-					puertoPeti.add(puertoP);
-
-					System.out.println("¿Desea seguir agregando distritos?[y/n]");
-					yn = entradaEscaner.nextLine ();
-
-					if(yn.equals("n")){
-						seguir = !seguir;
-					}
-				}//end while
-
-
-				/////*****EN ESTA PARTE SE INTERACTUA CON CLIENTES *****//////
+				//======================================================
+				//	INTERACCION CON CLIENTES
+				//======================================================
 
 				while(true){
 					byte[] buf = new byte[256];
@@ -105,18 +82,63 @@ public class mainServerThread extends Thread {
 		            socket.receive(packet);
 
 		            String received_D = recibir(packet);
-		            System.out.println("Pidiendo distrito: " + received_D);
-
-		            //en caso de que quiera ip multicast
-		            enviarIp_multi(received_D, packet);
-				}
+					if(received_D.equals("Xba1SS7lbAXmMe09aE12X2x")){
+						System.out.println("BORRAR: Pidiendo ids titanes...");
+			            //Se envía id titan a distrito
+						InetAddress address = packet.getAddress();
+						int port = packet.getPort();
+			            enviarU(String.valueOf(idsTitanes), address, port);
+						idsTitanes += 1;
+					}
+					else{
+						//en caso de que quiera ip multicast
+						enviarIp_multi(received_D, packet);
+					}
+				}//end while
 
 	        } catch (IOException e) {
 	            e.printStackTrace();
-	            moreQuotes = false;
+	            more = false;
 	        }
 	    }
 	    socket.close();
+	}//end run
+
+	//--------------------------------------------------------------------------
+
+	public void agregarDistritos(){
+		while(seguir){
+			System.out.println("AGREGAR DISTRITO");
+			System.out.println ("[Servidor Central] Nombre Distrito:");
+			Scanner entradaScanner = new Scanner (System.in); //Creación de un objeto Scanner
+			nDistrito = entradaScanner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+			System.out.println ("[Servidor Central] IP Multicast:");
+			ipM = entradaScanner.nextLine ();
+
+			System.out.println ("[Servidor Central] Puerto Multicast:");
+			puertoM = entradaScanner.nextLine ();
+
+			System.out.println ("[Servidor Central] IP Peticiones:");
+			//ipP = "test";
+			ipP = entradaScanner.nextLine ();
+
+			System.out.println ("[Servidor Central] Puerto Peticiones:");
+			puertoP = entradaScanner.nextLine ();
+
+			distritos.add(nDistrito);
+			ipMulti.add(ipM);
+			puertoMulti.add(puertoM);
+			ipPeti.add(ipP);
+			puertoPeti.add(puertoP);
+
+			System.out.println("¿Desea seguir agregando distritos?[y/n]");
+			yn = entradaScanner.nextLine ();
+
+			if(yn.equals("n")){
+				seguir = !seguir;
+			}
+		}//end while
 	}
 
 	//enviar ip multicast a clientes
@@ -128,16 +150,33 @@ public class mainServerThread extends Thread {
 		/**agregar cliente al registro de clientes*/
 		String key = address.getHostAddress() + "," + Integer.toString(port);
 
-		clientes_ubic.put(key,distrito);
+		if(distritos.contains(distrito)){
+			clientes_ubic.put(key,distrito);
+		}
 
 		System.out.println(Arrays.asList(clientes_ubic));
 
 		int i;
 		for(i=0;i<distritos.size();i++){
-			//enviar ip del distrito que solicito
+			//Verifica que el distrito que está pidiendo se encuentra en el servidor central.
 			if(distritos.get(i).equals(distrito)){
-				//[nombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
-				enviarU(distrito+","+ipMulti.get(i)+","+puertoMulti.get(i)+","+ipPeti.get(i)+","+puertoPeti.get(i), address, port);
+				String respuesta = "";
+				Scanner entradaScanner = new Scanner (System.in);
+				System.out.println("[Servidor Central] ¿Dar autorización a " + address + " por Distrito " + distrito + "?");
+				System.out.println("1.- SI");
+				System.out.println("2.- NO");
+				respuesta = entradaScanner.nextLine ();
+
+				if(respuesta.equals("1")){
+					//enviar ip del distrito que solicito
+					//[nombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
+					enviarU(distrito+","+ipMulti.get(i)+","+puertoMulti.get(i)+","+ipPeti.get(i)+","+puertoPeti.get(i), address, port);
+					System.out.print("Nombre: "+distrito);
+					System.out.print(", IP Multicast: "+ipMulti.get(i));
+					System.out.print(", Puerto Multicast: "+puertoMulti.get(i));
+					System.out.print(", IP Peticiones: "+ipPeti.get(i));
+					System.out.println(", Puerto Peticiones: "+puertoPeti.get(i));
+				}
 				return;
 			}
 		}
@@ -149,7 +188,6 @@ public class mainServerThread extends Thread {
 	public void enviarU(String mensaje, InetAddress ip_destino, int port){
 	    try{
 	        byte[] buf = new byte[256];
-
 	        buf = mensaje.getBytes();
 	        DatagramPacket packet = new DatagramPacket(buf, buf.length, ip_destino, port);
 	        socket.send(packet);

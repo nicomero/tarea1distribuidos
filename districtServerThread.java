@@ -38,43 +38,89 @@ public class districtServerThread extends Thread {
 	private long FIVE_SECONDS = 5000;
 	protected DatagramSocket socket = null;
 	protected BufferedReader in = null;
-	protected boolean moreQuotes = true;
+	protected boolean more = true;
 	HashMap<Integer,String> titanes=new HashMap<Integer,String>();
-	int id = 0;
 	int puerto;
+	String ipServer = "";
+	String puertoServer = "";
 	String nDistrito = "";
 	String ipMulti = "";
 	String ipPeti = "";
 	String puertoMulti = "";
 	String puertoPeti = "";
+	String claveSecreta = "Xba1SS7lbAXmMe09aE12X2x";
 
 	public districtServerThread() throws IOException {
+		System.out.println ("[Distrito] Ingresar IP Servidor Central:");
+		Scanner entradaScanner = new Scanner (System.in); //Creación de un objeto Scanner
+		ipServer = entradaScanner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+		System.out.println ("[Distrito] Ingresar Puerto Servidor Central:");
+		puertoServer = entradaScanner.nextLine ();
+
 		System.out.println ("[Distrito] Nombre Distrito:");
-		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
-		nDistrito = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		nDistrito = entradaScanner.nextLine ();
 
 		System.out.println ("[Distrito "+nDistrito+"] IP Multicast:");
-		ipMulti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		ipMulti = entradaScanner.nextLine ();
 
 		System.out.println ("[Distrito "+nDistrito+"] Puerto Multicast:");
-		puertoMulti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		puertoMulti = entradaScanner.nextLine ();
 
 		System.out.println ("[Distrito "+nDistrito+"] IP Peticiones:");
-		ipPeti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		ipPeti = entradaScanner.nextLine ();
 
 		System.out.println ("[Distrito "+nDistrito+"] Puerto Peticiones:");
-		puertoPeti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		puertoPeti = entradaScanner.nextLine ();
 
         socket = new DatagramSocket(Integer.parseInt(puertoPeti), InetAddress.getByName(ipPeti));
 	}
 
 	public void run() {
+		//funcion que lee desde consola
+		inputLocal();
+		//Escucha las instrucciones que da el cliente
+		escucharCliente(socket);
+	}
 
-		inputLocal();//funcion que lee desde consola
+	public void inputLocal(){	//funcion que se encarga de leer de consola
+		Thread t = new Thread(new Runnable(){
+			public void run(){
 
+				Scanner scan = new Scanner(System.in);
+				String input;
+				try{
+					DatagramSocket socket_multi = new DatagramSocket();
+
+					while(true){
+
+						String dString = new Date().toString();
+
+						System.out.println("Escoja opcion [Publicar Titan]");
+						input = scan.nextLine();
+
+						if(input.equals("Publicar Titan")){
+							crearTitan();
+
+							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
+						}
+						else{
+							System.out.println("Ingrese mensaje valido");
+						}
+					}
+				}catch(IOException e){
+					System.out.println("inputLocal Distrito");
+					e.printStackTrace();
+				}
+				//socket.close();
+			}
+		});
+		t.start();
+	}
+
+	public void escucharCliente(DatagramSocket socket){
 		try{
-			while (moreQuotes) {
-
+			while (more) {
 				byte[] buf = new byte[256];
 				//Recibir el paquete para determinar lo que el cliente quiere
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -84,24 +130,24 @@ public class districtServerThread extends Thread {
 				System.out.println("mensaje recibido: " + received_D);
 
 				if (received_D.equals("1")){//cliente quiere ver titanes
-					enviarC("lista de titanes",packet ,socket);
+					enviarC("Lista de titanes",packet ,socket);
 				}
 				else if (received_D.equals("3")){//cliente quiere capturar titanes
-					enviarC("info titan capturado",packet ,socket);
+					enviarC("Info titan capturado",packet ,socket);
 				}
 				else if (received_D.equals("4")){//cliente quiere matar titanes
-					enviarC("info titan muerto",packet ,socket);
+					enviarC("Info titan muerto",packet ,socket);
 				}
-
-	        }
-	        socket.close();
+			}
+			socket.close();
 		}catch(IOException e){
 			System.out.println("run distrito");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
-	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){//enviar mensajes a multicast
+	//enviar mensajes a multicast
+	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
         try{
             byte[] buf = new byte[256];
 
@@ -115,7 +161,8 @@ public class districtServerThread extends Thread {
         }
 	}
 
-	public void enviarC(String mensaje, DatagramPacket packet, DatagramSocket socket){//enviar mensajes a cliente
+	//enviar mensajes a cliente
+	public void enviarC(String mensaje, DatagramPacket packet, DatagramSocket socket){
 		try{
 			byte[] buf = new byte[256];
 			//extraer puerto y direccion
@@ -126,47 +173,9 @@ public class districtServerThread extends Thread {
 			DatagramPacket paquete = new DatagramPacket(buf, buf.length, address, port);
 			socket.send(paquete);
 		}catch(IOException e) {
-			System.out.println("enviarU Distrito");
+			System.out.println("enviarC Distrito");
 			e.printStackTrace();
 		}
-	}
-
-
-	public void inputLocal(){	//funcion que se encarga de leer de consola
-		Thread t = new Thread(new Runnable(){
-			public void run(){
-
-
-				Scanner scan = new Scanner(System.in);
-				String input;
-				try{
-					DatagramSocket socket_multi = new DatagramSocket();
-
-
-
-					while(true){
-
-						String dString = new Date().toString();
-
-						System.out.println("escoga opcion [Publicar titan]");
-						input = scan.nextLine();
-
-						if(input.equals("Publicar titan")){
-
-							crearTitan();
-							System.out.println(Arrays.asList(titanes));
-
-							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
-						}
-					}
-				}catch(IOException e){
-					System.out.println("inputLocal Distrito");
-					e.printStackTrace();
-				}
-				//socket.close();
-			}
-		});
-		t.start();
 	}
 
 	//recibe un mensaje en formato string para retornarlo
@@ -177,17 +186,71 @@ public class districtServerThread extends Thread {
 	    return received;
 	}
 
+	//recibe un mensaje del socket
+	public static String recibirSocket(DatagramSocket socket){
+        try{
+            byte[] buf = new byte[256];
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            socket.receive(packet);
+
+            // display response
+            String received = new String(packet.getData(), 0, packet.getLength());
+            return received;
+        }catch(IOException e) {}
+        return "Fallo";
+	}
+
 	public void crearTitan(){
+		try{
+			socket = new DatagramSocket();
 
-		Scanner scan = new Scanner(System.in);
-		String input;
+			Scanner scan = new Scanner(System.in);
+			String input, valor;
 
-		System.out.println("Escoga nombre");
-		input = scan.nextLine();
-		System.out.println("Escoga tipo");
-		input = input + "," +scan.nextLine();
-		titanes.put(id, input);
-		id = id+1;
+			System.out.println("[Distrito "+nDistrito+"] Introducir Nombre");
+			input = scan.nextLine();
+			System.out.println("[Distrito "+nDistrito+"] Introducir Tipo");
+
+			while(true){
+				System.out.println("1.- Normal");
+				System.out.println("2.- Excentrico");
+				System.out.println("3.- Cambiante");
+				valor = scan.nextLine();
+
+				if(valor.equals("1")){
+					input = input+","+valor;
+					break ;
+				}
+				else if(valor.equals("2")){
+					input = input+","+valor;
+					break;
+				}
+				else if(valor.equals("3")){
+					input = input+","+valor;
+					break;
+				}
+				System.out.println("Ingrese una respuesta valida");
+			}
+
+
+			byte[] buf = new byte[256];
+			InetAddress address = InetAddress.getByName(ipServer);
+			String puerto_destino = puertoServer;
+			buf = claveSecreta.getBytes();
+			DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino));
+			socket.send(packet);
+
+			int id = Integer.parseInt(recibirSocket(socket));
+			titanes.put(id, input);
+			System.out.println("BORRAR: "+Arrays.asList(titanes));
+
+			System.out.println("[Distrito "+nDistrito+"] Se ha publicado el Titán: "+titanes.get(id));
+
+			return ;
+		}catch(IOException e) {
+			System.out.println("crearTitan Distrito");
+			e.printStackTrace();
+		}
 
 	}
 
