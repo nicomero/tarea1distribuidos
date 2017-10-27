@@ -45,6 +45,14 @@ public class mainServerThread extends Thread {
 	List<String> puertoPeti = new ArrayList<String>();
 	HashMap<String,String> clientes_ubic=new HashMap<String,String>();
 
+	String nDistrito = "";
+	String ipM = "";
+	String puertoM = "";
+	String ipP = "";
+	String puertoP = "";
+	String yn = "";
+	boolean seguir = true;
+
 	public mainServerThread() throws IOException {
         socket = new DatagramSocket(4445);
 	}
@@ -53,49 +61,11 @@ public class mainServerThread extends Thread {
 	    while (more) {
 	        try {
 
-				String nDistrito = "";
-				String ipM = "";
-				String puertoM = "";
-				String ipP = "";
-				String puertoP = "";
-				String yn = "";
-				boolean seguir = true;
+				agregarDistritos();
 
-				//Seguir preguntando por distritos a agregar
-				while(seguir){
-					System.out.println("AGREGAR DISTRITO");
-					System.out.println ("[Servidor Central] Nombre Distrito:");
-				   	Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
-				   	nDistrito = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
-
-					System.out.println ("[Servidor Central] IP Multicast:");
-				   	ipM = entradaEscaner.nextLine ();
-
-					System.out.println ("[Servidor Central] Puerto Multicast:");
-				   	puertoM = entradaEscaner.nextLine ();
-
-					System.out.println ("[Servidor Central] IP Peticiones:");
-					//ipP = "test";
-					ipP = entradaEscaner.nextLine ();
-
-					System.out.println ("[Servidor Central] Puerto Peticiones:");
-				   	puertoP = entradaEscaner.nextLine ();
-
-					distritos.add(nDistrito);
-					ipMulti.add(ipM);
-					puertoMulti.add(puertoM);
-					ipPeti.add(ipP);
-					puertoPeti.add(puertoP);
-
-					System.out.println("¿Desea seguir agregando distritos?[y/n]");
-					yn = entradaEscaner.nextLine ();
-
-					if(yn.equals("n")){
-						seguir = !seguir;
-					}
-				}//end while
-
-				/////*****EN ESTA PARTE SE INTERACTUA CON CLIENTES *****//////
+				//======================================================
+				//	INTERACCION CON CLIENTES
+				//======================================================
 
 				while(true){
 					byte[] buf = new byte[256];
@@ -117,6 +87,41 @@ public class mainServerThread extends Thread {
 	    }
 	    socket.close();
 	}//end run
+
+	public void agregarDistritos(){
+		while(seguir){
+			System.out.println("AGREGAR DISTRITO");
+			System.out.println ("[Servidor Central] Nombre Distrito:");
+			Scanner entradaScanner = new Scanner (System.in); //Creación de un objeto Scanner
+			nDistrito = entradaScanner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+			System.out.println ("[Servidor Central] IP Multicast:");
+			ipM = entradaScanner.nextLine ();
+
+			System.out.println ("[Servidor Central] Puerto Multicast:");
+			puertoM = entradaScanner.nextLine ();
+
+			System.out.println ("[Servidor Central] IP Peticiones:");
+			//ipP = "test";
+			ipP = entradaScanner.nextLine ();
+
+			System.out.println ("[Servidor Central] Puerto Peticiones:");
+			puertoP = entradaScanner.nextLine ();
+
+			distritos.add(nDistrito);
+			ipMulti.add(ipM);
+			puertoMulti.add(puertoM);
+			ipPeti.add(ipP);
+			puertoPeti.add(puertoP);
+
+			System.out.println("¿Desea seguir agregando distritos?[y/n]");
+			yn = entradaScanner.nextLine ();
+
+			if(yn.equals("n")){
+				seguir = !seguir;
+			}
+		}//end while
+	}
 
 	//enviar ip multicast a clientes
 	public void enviarIp_multi(String distrito, DatagramPacket packet){
