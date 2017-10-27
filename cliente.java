@@ -47,20 +47,19 @@ public class cliente {
 		int puertoCliente = 0;
 
 		System.out.println ("[Cliente] Ingresar IP Servidor Central:");
-		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
-		ipServer = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		Scanner entradaScanner = new Scanner (System.in); //Creación de un objeto Scanner
+		ipServer = entradaScanner.nextLine (); //Invocamos un método sobre un objeto Scanner
 
 		System.out.println ("[Cliente] Ingresar Puerto Servidor Central:");
-		puertoServer = entradaEscaner.nextLine ();
+		puertoServer = entradaScanner.nextLine ();
 
+		//Crea socket cliente
 		DatagramSocket socket = new DatagramSocket();
 
 		while(otroDist){//mientras quiera más distritos
 
-			boolean masTitan = true;
-
 			System.out.println ("[Cliente] Introducir Nombre de Distrito a Investigar:");
-			nDistrito = entradaEscaner.nextLine ();
+			nDistrito = entradaScanner.nextLine ();
 
 			//======================================================
 	        //	CONECTARSE AL SERVIDOR CENTRAL
@@ -74,8 +73,6 @@ public class cliente {
 			//[NombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
 			List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
 			System.out.println("info distrito: "+info);
-	        // cerrar socket
-	        //socket.close();
 
 			//======================================================
 	        //	CONECTARSE AL SERVIDOR DE UN DISTRITO
@@ -88,59 +85,80 @@ public class cliente {
 	        InetAddress address = InetAddress.getByName(info.get(1));
 	        socketD.joinGroup(address);
 
-			//socket = new DatagramSocket();
 			detectarMulti(socketD);//detecta si hay algo escrito en el multicast
 
-			String input;
-
-	        while(masTitan) {//mientras se quieran hacer acciones en el distrito actual
-
-	            System.out.println ("[Cliente] Consola");
-				System.out.println ("[Cliente] (1) Listar Titanes");
-				System.out.println ("[Cliente] (2) Cambiar Distrito");
-				System.out.println ("[Cliente] (3) Capturar Titan");
-				System.out.println ("[Cliente] (4) Asesinar Titan");
-				System.out.println ("[Cliente] (5) Listar Titanes Capturados");
-				System.out.println ("[Cliente] (6) Listar Titanes Asesinados");
-
-				input = entradaEscaner.nextLine();
-				//info.get(3)=IP Peticiones
-				//info.get(4)=Puerto Peticionoes
-
-				if(input.equals("1")){//Listar titanes
-					enviarU(input,info.get(3),info.get(4),socket);
-					input=recibir(socket);
-					System.out.println ("[Cliente] Lo que llego fue:--" + input);
-				}
-				else if (input.equals("2")){//cambiar distrito
-					masTitan = false;
-				}
-				else if (input.equals("3")){//Capturar titan
-					enviarU(input,info.get(3),info.get(4),socket);
-					input=recibir(socket);
-					System.out.println ("[Cliente] Lo que llego fue:--" + input);
-				}
-				else if (input.equals("4")){//Asesinar titan
-					enviarU(input,info.get(3),info.get(4),socket);
-					input=recibir(socket);
-					System.out.println ("[Cliente] Lo que llego fue:--" + input);
-				}
-				else if (input.equals("5")){//Listar titanes capturados
-					System.out.println ("[Cliente] Titanes capturados");
-				}
-				else if (input.equals("6")){//Listar titanes asesinados
-					System.out.println ("[Cliente] Titanes asesinados");
-				}
-				else {
-					System.out.println ("[Cliente] Ingrese algo valido");
-				}
-	        }
+			interfazCliente(socket, info, entradaScanner);
 
 	        socketD.leaveGroup(address);
 	        socketD.close();
-			//socket.close();
 		}//end while
 	}
+
+	public static void interfazCliente(DatagramSocket socket, List<String> info, Scanner entradaScanner){
+		String input;
+		boolean masTitan = true;
+		while(masTitan) {//mientras se quieran hacer acciones en el distrito actual
+
+			System.out.println ("[Cliente] Consola");
+			System.out.println ("[Cliente] (1) Listar Titanes");
+			System.out.println ("[Cliente] (2) Cambiar Distrito");
+			System.out.println ("[Cliente] (3) Capturar Titan");
+			System.out.println ("[Cliente] (4) Asesinar Titan");
+			System.out.println ("[Cliente] (5) Listar Titanes Capturados");
+			System.out.println ("[Cliente] (6) Listar Titanes Asesinados");
+
+			input = entradaScanner.nextLine();
+			//info.get(3)=IP Peticiones
+			//info.get(4)=Puerto Peticionoes
+			if(input.equals("1")){//Listar titanes
+				enviarU(input,info.get(3),info.get(4),socket);
+				input=recibir(socket);
+				System.out.println ("[Cliente] Lo que llego fue:--" + input);
+			}
+			else if (input.equals("2")){//cambiar distrito
+				masTitan = false;
+			}
+			else if (input.equals("3")){//Capturar titan
+				enviarU(input,info.get(3),info.get(4),socket);
+				input=recibir(socket);
+				System.out.println ("[Cliente] Lo que llego fue:--" + input);
+			}
+			else if (input.equals("4")){//Asesinar titan
+				enviarU(input,info.get(3),info.get(4),socket);
+				input=recibir(socket);
+				System.out.println ("[Cliente] Lo que llego fue:--" + input);
+			}
+			else if (input.equals("5")){//Listar titanes capturados
+				System.out.println ("[Cliente] Titanes capturados");
+			}
+			else if (input.equals("6")){//Listar titanes asesinados
+				System.out.println ("[Cliente] Titanes asesinados");
+			}
+			else {
+				System.out.println ("[Cliente] Ingrese algo valido");
+			}
+		}
+	}//end interfazCliente
+
+	public static void detectarMulti(MulticastSocket socketD){
+		Thread t = new Thread(new Runnable(){
+
+			public void run(){
+
+				boolean flag = false; //indica si hay fallo en el socket
+
+				while(!flag){//mientras NO halla fallo en el socket
+
+					String received_D = recibir(socketD);
+					flag = received_D.equals("Fallo");
+					if (!flag){
+						System.out.println("Date: " + received_D);
+					}
+				}
+			}
+		});
+		t.start();
+	}//end detectarMulti
 
 	//envia un mensaje a la ip dada por cierto socket
 	public static void enviarU(String mensaje, String ip_destino, String puerto_destino, DatagramSocket socket){
@@ -169,26 +187,6 @@ public class cliente {
             return received;
         }catch(IOException e) {}
         return "Fallo";
-	}
-
-	public static void detectarMulti(MulticastSocket socketD){
-		Thread t = new Thread(new Runnable(){
-
-			public void run(){
-
-				boolean flag = false; //indica si hay fallo en el socket
-
-				while(!flag){//mientras NO halla fallo en el socket
-
-					String received_D = recibir(socketD);
-					flag = received_D.equals("Fallo");
-					if (!flag){
-						System.out.println("Date: " + received_D);
-					}
-				}
-			}
-		});
-		t.start();
 	}
 
 }//end class cliente

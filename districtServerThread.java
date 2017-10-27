@@ -69,73 +69,10 @@ public class districtServerThread extends Thread {
 	}
 
 	public void run() {
-
 		//funcion que lee desde consola
 		inputLocal();
-
 		//Escucha las instrucciones que da el cliente
 		escucharCliente(socket);
-
-	}
-
-	//enviar mensajes a multicast
-	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
-        try{
-            byte[] buf = new byte[256];
-
-            InetAddress address = InetAddress.getByName(ip_destino);
-            buf = mensaje.getBytes();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puertoMulti));
-            socket.send(packet);
-        }catch(IOException e) {
-            System.out.println("enviarU Distrito");
-            e.printStackTrace();
-        }
-	}
-
-	//enviar mensajes a cliente
-	public void enviarC(String mensaje, DatagramPacket packet, DatagramSocket socket){
-		try{
-			byte[] buf = new byte[256];
-			//extraer puerto y direccion
-			InetAddress address = packet.getAddress();
-			int port = packet.getPort();
-
-			buf = mensaje.getBytes();
-			DatagramPacket paquete = new DatagramPacket(buf, buf.length, address, port);
-			socket.send(paquete);
-		}catch(IOException e) {
-			System.out.println("enviarC Distrito");
-			e.printStackTrace();
-		}
-	}
-
-	public void escucharCliente(DatagramSocket socket){
-		try{
-			while (more) {
-				byte[] buf = new byte[256];
-				//Recibir el paquete para determinar lo que el cliente quiere
-				DatagramPacket packet = new DatagramPacket(buf, buf.length);
-				socket.receive(packet);
-
-				String received_D = recibir(packet);//recibir peticiones del cliente
-				System.out.println("mensaje recibido: " + received_D);
-
-				if (received_D.equals("1")){//cliente quiere ver titanes
-					enviarC("Lista de titanes",packet ,socket);
-				}
-				else if (received_D.equals("3")){//cliente quiere capturar titanes
-					enviarC("Info titan capturado",packet ,socket);
-				}
-				else if (received_D.equals("4")){//cliente quiere matar titanes
-					enviarC("Info titan muerto",packet ,socket);
-				}
-			}
-			socket.close();
-		}catch(IOException e){
-			System.out.println("run distrito");
-			e.printStackTrace();
-		}
 	}
 
 	public void inputLocal(){	//funcion que se encarga de leer de consola
@@ -173,6 +110,66 @@ public class districtServerThread extends Thread {
 			}
 		});
 		t.start();
+	}
+
+	public void escucharCliente(DatagramSocket socket){
+		try{
+			while (more) {
+				byte[] buf = new byte[256];
+				//Recibir el paquete para determinar lo que el cliente quiere
+				DatagramPacket packet = new DatagramPacket(buf, buf.length);
+				socket.receive(packet);
+
+				String received_D = recibir(packet);//recibir peticiones del cliente
+				System.out.println("mensaje recibido: " + received_D);
+
+				if (received_D.equals("1")){//cliente quiere ver titanes
+					enviarC("Lista de titanes",packet ,socket);
+				}
+				else if (received_D.equals("3")){//cliente quiere capturar titanes
+					enviarC("Info titan capturado",packet ,socket);
+				}
+				else if (received_D.equals("4")){//cliente quiere matar titanes
+					enviarC("Info titan muerto",packet ,socket);
+				}
+			}
+			socket.close();
+		}catch(IOException e){
+			System.out.println("run distrito");
+			e.printStackTrace();
+		}
+	}
+
+	//enviar mensajes a multicast
+	public void enviarU(String mensaje, String ip_destino, DatagramSocket socket){
+        try{
+            byte[] buf = new byte[256];
+
+            InetAddress address = InetAddress.getByName(ip_destino);
+            buf = mensaje.getBytes();
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puertoMulti));
+            socket.send(packet);
+        }catch(IOException e) {
+            System.out.println("enviarU Distrito");
+            e.printStackTrace();
+        }
+	}
+
+	//enviar mensajes a cliente
+	public void enviarC(String mensaje, DatagramPacket packet, DatagramSocket socket){
+		try{
+			byte[] buf = new byte[256];
+			//extraer puerto y direccion
+			InetAddress address = packet.getAddress();
+			int port = packet.getPort();
+
+			buf = mensaje.getBytes();
+			DatagramPacket paquete = new DatagramPacket(buf, buf.length, address, port);
+			socket.send(paquete);
+		}catch(IOException e) {
+			System.out.println("enviarC Distrito");
+			e.printStackTrace();
+		}
 	}
 
 	//recibe un mensaje en formato string para retornarlo
