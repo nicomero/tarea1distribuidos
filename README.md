@@ -37,6 +37,10 @@ n
 
 * Abrir districtServer 1
 ```
+[Distrito] Ingresar IP Servidor Central:
+127.0.0.1
+[Distrito] Ingresar Puerto Servidor Central:
+4445
 [Distrito] Nombre Distrito:
 Trost
 [Distrito Trost] IP Multicast:
@@ -51,6 +55,10 @@ Trost
 
 * Abrir districtServer 2
 ```
+[Distrito] Ingresar IP Servidor Central:
+127.0.0.1
+[Distrito] Ingresar Puerto Servidor Central:
+4445
 [Distrito] Nombre Distrito:
 Panchitolandia
 [Distrito Trost] IP Multicast:

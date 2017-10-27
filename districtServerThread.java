@@ -41,6 +41,8 @@ public class districtServerThread extends Thread {
 	protected boolean more = true;
 	HashMap<Integer,String> titanes=new HashMap<Integer,String>();
 	int puerto;
+	String ipServer = "";
+	String puertoServer = "";
 	String nDistrito = "";
 	String ipMulti = "";
 	String ipPeti = "";
@@ -49,21 +51,27 @@ public class districtServerThread extends Thread {
 	String claveSecreta = "Xba1SS7lbAXmMe09aE12X2x";
 
 	public districtServerThread() throws IOException {
+		System.out.println ("[Distrito] Ingresar IP Servidor Central:");
+		Scanner entradaScanner = new Scanner (System.in); //Creación de un objeto Scanner
+		ipServer = entradaScanner.nextLine (); //Invocamos un método sobre un objeto Scanner
+
+		System.out.println ("[Distrito] Ingresar Puerto Servidor Central:");
+		puertoServer = entradaScanner.nextLine ();
+
 		System.out.println ("[Distrito] Nombre Distrito:");
-		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
-		nDistrito = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		nDistrito = entradaScanner.nextLine ();
 
 		System.out.println ("[Distrito "+nDistrito+"] IP Multicast:");
-		ipMulti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		ipMulti = entradaScanner.nextLine ();
 
 		System.out.println ("[Distrito "+nDistrito+"] Puerto Multicast:");
-		puertoMulti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		puertoMulti = entradaScanner.nextLine ();
 
 		System.out.println ("[Distrito "+nDistrito+"] IP Peticiones:");
-		ipPeti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		ipPeti = entradaScanner.nextLine ();
 
 		System.out.println ("[Distrito "+nDistrito+"] Puerto Peticiones:");
-		puertoPeti = entradaEscaner.nextLine (); //Invocamos un método sobre un objeto Scanner
+		puertoPeti = entradaScanner.nextLine ();
 
         socket = new DatagramSocket(Integer.parseInt(puertoPeti), InetAddress.getByName(ipPeti));
 	}
@@ -205,8 +213,8 @@ public class districtServerThread extends Thread {
 			input = input + "," +scan.nextLine();
 
 			byte[] buf = new byte[256];
-			InetAddress address = InetAddress.getByName("127.0.0.1");
-			String puerto_destino = "4445";
+			InetAddress address = InetAddress.getByName(ipServer);
+			String puerto_destino = puertoServer;
 			buf = claveSecreta.getBytes();
 			DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino));
 			socket.send(packet);
@@ -217,9 +225,9 @@ public class districtServerThread extends Thread {
 
 			System.out.println(Arrays.asList(titanes));
 		}catch(IOException e) {
-			System.out.println("enviarC Distrito");
+			System.out.println("crearTitan Distrito");
 			e.printStackTrace();
-		}	
+		}
 
 	}
 
