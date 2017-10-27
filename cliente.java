@@ -44,6 +44,7 @@ public class cliente {
 		String puertoServer = "";
 		String nDistrito = "";
 		boolean otroDist = true;
+		int puertoCliente = 0;
 
 		System.out.println ("[Cliente] Ingresar IP Servidor Central:");
 		Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
@@ -52,15 +53,20 @@ public class cliente {
 		System.out.println ("[Cliente] Ingresar Puerto Servidor Central:");
 		puertoServer = entradaEscaner.nextLine ();
 
-		while(otroDist){ //mientras quiera más distritos
+		DatagramSocket socket = new DatagramSocket();
+
+		while(otroDist){//mientras quiera más distritos
 
 			boolean masTitan = true;
 
 			System.out.println ("[Cliente] Introducir Nombre de Distrito a Investigar:");
 			nDistrito = entradaEscaner.nextLine ();
 
+			//======================================================
+	        //	CONECTARSE AL SERVIDOR CENTRAL
+			//======================================================
+
 	        //Envía solicitud de info Multicast al servidor central
-	        DatagramSocket socket = new DatagramSocket();
 	        enviarU(nDistrito, ipServer, puertoServer, socket);
 
 	        //Recibe la información del distrito
@@ -69,7 +75,7 @@ public class cliente {
 			List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
 			System.out.println("info distrito: "+info);
 	        // cerrar socket
-	        socket.close();
+	        //socket.close();
 
 			//======================================================
 	        //	CONECTARSE AL SERVIDOR DE UN DISTRITO
@@ -82,7 +88,7 @@ public class cliente {
 	        InetAddress address = InetAddress.getByName(info.get(1));
 	        socketD.joinGroup(address);
 
-			socket = new DatagramSocket();
+			//socket = new DatagramSocket();
 			detectarMulti(socketD);//detecta si hay algo escrito en el multicast
 
 			String input;
@@ -132,7 +138,7 @@ public class cliente {
 
 	        socketD.leaveGroup(address);
 	        socketD.close();
-			socket.close();
+			//socket.close();
 		}//end while
 	}
 
