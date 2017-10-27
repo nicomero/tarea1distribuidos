@@ -94,15 +94,15 @@ public class districtServerThread extends Thread {
 
 					while(true){
 
-						String dString = new Date().toString();
+						String dString ;
 
 						System.out.println("Escoja opcion [Publicar Titan]");
 						input = scan.nextLine();
 
 						if(input.equals("Publicar Titan")){
-							crearTitan();
-
-							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
+							int id = crearTitan();
+							dString = titanes.get(id);
+							enviarU("Aparecio "+Integer.toString(id)+" "+dString+" en "+nDistrito, ipMulti, socket_multi);
 						}
 						else{
 							System.out.println("Ingrese mensaje valido");
@@ -200,7 +200,7 @@ public class districtServerThread extends Thread {
         return "Fallo";
 	}
 
-	public void crearTitan(){
+	public int crearTitan(){
 		try{
 			socket = new DatagramSocket();
 
@@ -246,12 +246,12 @@ public class districtServerThread extends Thread {
 
 			System.out.println("[Distrito "+nDistrito+"] Se ha publicado el Titán: "+titanes.get(id));
 
-			return ;
+			return id;
 		}catch(IOException e) {
 			System.out.println("crearTitan Distrito");
 			e.printStackTrace();
 		}
-
+		return -1;
 	}
 
 }//end districtServerThread

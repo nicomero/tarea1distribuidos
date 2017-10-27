@@ -156,7 +156,7 @@ public class cliente {
 					String received_D = recibir(socketD);
 					flag = received_D.equals("Fallo");
 					if (!flag){
-						System.out.println("Date: " + received_D);
+						System.out.println("AVISO: " + received_D);
 					}
 				}
 			}
