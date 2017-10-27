@@ -1,7 +1,4 @@
 # tarea1distribuidos
-localhost: 127.0.0.1
-multicast: 230.0.0.1
-
 Nicolas Alarcon
 Rodrigo Elicer
 
@@ -61,13 +58,13 @@ Trost
 4445
 [Distrito] Nombre Distrito:
 Panchitolandia
-[Distrito Trost] IP Multicast:
+[Distrito Panchitolandia] IP Multicast:
 231.0.0.1
-[Distrito Trost] Puerto Multicast:
+[Distrito Panchitolandia] Puerto Multicast:
 5556
-[Servidor Trost] IP Peticiones:
+[Servidor Panchitolandia] IP Peticiones:
 127.0.0.1
-[Distrito Trost] Puerto Peticiones:
+[Distrito Panchitolandia] Puerto Peticiones:
 6788
 ```
 

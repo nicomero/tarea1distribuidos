@@ -96,10 +96,10 @@ public class districtServerThread extends Thread {
 
 						String dString = new Date().toString();
 
-						System.out.println("Escoja opcion [Publicar titan]");
+						System.out.println("Escoja opcion [Publicar Titan]");
 						input = scan.nextLine();
 
-						if(input.equals("Publicar titan")){
+						if(input.equals("Publicar Titan")){
 							crearTitan();
 
 							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
@@ -205,12 +205,33 @@ public class districtServerThread extends Thread {
 			socket = new DatagramSocket();
 
 			Scanner scan = new Scanner(System.in);
-			String input;
+			String input, valor;
 
-			System.out.println("Escoga nombre");
+			System.out.println("[Distrito "+nDistrito+"] Introducir Nombre");
 			input = scan.nextLine();
-			System.out.println("Escoga tipo");
-			input = input + "," +scan.nextLine();
+			System.out.println("[Distrito "+nDistrito+"] Introducir Tipo");
+
+			while(true){
+				System.out.println("1.- Normal");
+				System.out.println("2.- Excentrico");
+				System.out.println("3.- Cambiante");
+				valor = scan.nextLine();
+
+				if(valor.equals("1")){
+					input = input+","+valor;
+					break ;
+				}
+				else if(valor.equals("2")){
+					input = input+","+valor;
+					break;
+				}
+				else if(valor.equals("3")){
+					input = input+","+valor;
+					break;
+				}
+				System.out.println("Ingrese una respuesta valida");
+			}
+
 
 			byte[] buf = new byte[256];
 			InetAddress address = InetAddress.getByName(ipServer);
@@ -219,11 +240,13 @@ public class districtServerThread extends Thread {
 			DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(puerto_destino));
 			socket.send(packet);
 
-			String id = recibirSocket(socket);
+			int id = Integer.parseInt(recibirSocket(socket));
+			titanes.put(id, input);
+			System.out.println("BORRAR: "+Arrays.asList(titanes));
 
-			titanes.put(Integer.parseInt(id), input);
+			System.out.println("[Distrito "+nDistrito+"] Se ha publicado el Titán: "+titanes.get(id));
 
-			System.out.println(Arrays.asList(titanes));
+			return ;
 		}catch(IOException e) {
 			System.out.println("crearTitan Distrito");
 			e.printStackTrace();
