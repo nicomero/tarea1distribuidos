@@ -117,7 +117,7 @@ public class cliente {
 			if(input.equals("1")){//Listar titanes
 				enviarU(input,info.get(3),info.get(4),socket);
 				input=recibir(socket);
-				System.out.println ("[Cliente] Lo que llego fue:--" + input);
+				System.out.println ("[Cliente] LISTA DE TITANES:\n" + input);
 			}
 			else if (input.equals("2")){//cambiar distrito
 				masTitan = false;

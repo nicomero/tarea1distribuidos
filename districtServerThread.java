@@ -129,8 +129,13 @@ public class districtServerThread extends Thread {
 				String received_D = recibir(packet);//recibir peticiones del cliente
 				System.out.println("mensaje recibido: " + received_D);
 
+				String correo = "";
+
 				if (received_D.equals("1")){//cliente quiere ver titanes
-					enviarC("Lista de titanes",packet ,socket);
+					for(Map.Entry m:titanes.entrySet()){
+   						correo += m.getKey()+" "+m.getValue()+"\n";
+  					}
+					enviarC(correo,packet ,socket);
 				}
 				else if (received_D.equals("3")){//cliente quiere capturar titanes
 					enviarC("Info titan capturado",packet ,socket);
