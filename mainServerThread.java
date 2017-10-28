@@ -55,6 +55,8 @@ public class mainServerThread extends Thread {
 
 	int idsTitanes = 0;
 
+	String claveSecreta = "Xba1SS7lbAXmMe09aE12X2x";
+
 	public mainServerThread() throws IOException {
         socket = new DatagramSocket(4445);
 	}
@@ -82,7 +84,8 @@ public class mainServerThread extends Thread {
 		            socket.receive(packet);
 
 		            String received_D = recibir(packet);
-					if(received_D.equals("Xba1SS7lbAXmMe09aE12X2x")){
+					//Distrito pide ID titanes para sincronizar
+					if(received_D.equals(claveSecreta)){
 			            //Se envía id titan a distrito
 						InetAddress address = packet.getAddress();
 						int port = packet.getPort();
@@ -90,7 +93,7 @@ public class mainServerThread extends Thread {
 						idsTitanes += 1;
 					}
 					else{
-						//en caso de que quiera ip multicast
+						//cliente pide ip multicast
 						enviarIp_multi(received_D, packet);
 					}
 				}//end while

@@ -167,6 +167,7 @@ public class districtServerThread extends Thread {
 					enviarC(correo, packet, socket);
 				}
 				else if (received_D.equals("3")){//cliente quiere capturar titanes
+					//Pasando listas a string, preferible no entender.
 					Iterator it = titanes.entrySet().iterator();
 					while (it.hasNext()) {
 						Map.Entry pair = (Map.Entry)it.next();
@@ -185,12 +186,33 @@ public class districtServerThread extends Thread {
 					System.out.println(correo);
 					enviarC(correo, packet ,socket);
 				}
-				else if (received_D.contains("3/")){
+				else if (received_D.contains("3/")){//cliente captura titan
 					List<String> capturando = new ArrayList<String>(Arrays.asList(received_D.split("/")));
 					titanes.remove(Integer.parseInt(capturando.get(1)));
 				}
 				else if (received_D.equals("4")){//cliente quiere matar titanes
-					enviarC("Info titan muerto", packet, socket);
+					//Pasando listas a string, preferible no entender.
+					Iterator it = titanes.entrySet().iterator();
+					while (it.hasNext()) {
+						Map.Entry pair = (Map.Entry)it.next();
+						if(!titanes.get(pair.getKey()).get(1).equals("Cambiante")){
+							listado.add(Arrays.asList(pair.getKey().toString(),titanes.get(pair.getKey()).get(0),titanes.get(pair.getKey()).get(1)));
+						}
+					}
+					System.out.println(listado);
+					for (List<String> s : listado){
+						correo += s + "";
+					}
+					String a;
+					a = correo.replaceAll("\\[", "/").replaceAll("]", "/");
+					correo = a.replaceAll(" ", "");
+
+					System.out.println(correo);
+					enviarC(correo, packet ,socket);
+				}
+				else if (received_D.contains("4/")){//cliente mata titan
+					List<String> asesinando = new ArrayList<String>(Arrays.asList(received_D.split("/")));
+					titanes.remove(Integer.parseInt(asesinando.get(1)));
 				}
 			}
 			socket.close();

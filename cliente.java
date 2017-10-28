@@ -156,13 +156,35 @@ public class cliente {
 			else if (input.equals("4")){//Asesinar titan
 				enviarU(input,info.get(3),info.get(4),socket);
 				input=recibir(socket);
-				System.out.println("[Cliente]["+nDistrito+"]Lo que llego fue:--" + input);
+				//["",[a,b,c],"",[a,b,c],...]
+				List<String> titanesDisponibles = new ArrayList<String>(Arrays.asList(input.split("/")));
+				List<String> sublista = new ArrayList<String>();
+				HashMap<String,List<String>> idDisponibles = new HashMap<String,List<String>>();
+				System.out.println("Elija un ID");
+				for(i=0;i<titanesDisponibles.size();i++){
+					int b = i%2;
+					if(b == 1){
+						sublista = Arrays.asList(titanesDisponibles.get(i).split(","));
+						idDisponibles.put(sublista.get(0),Arrays.asList(sublista.get(1),sublista.get(2)));
+						System.out.println(sublista.get(0)+".- Nombre: "+sublista.get(1)+", Tipo: "+sublista.get(2));
+					}
+				}
+				input = entradaScanner.nextLine();
+				while(!idDisponibles.containsKey(input)){
+					System.out.println("Por favor ingrese un ID valido");
+					input = entradaScanner.nextLine();
+				}
+
+				asesinados.put(input,idDisponibles.get(input));
+				enviarU("4/"+input,info.get(3),info.get(4),socket);
+				System.out.println("¡Se ha asesinado el titan con éxito!");
+
 			}
 			else if (input.equals("5")){//Listar titanes capturados
-				System.out.println("[Cliente]["+nDistrito+"] "+capturados);
+				System.out.println("[Cliente]["+nDistrito+"] "+capturados+"\n");
 			}
 			else if (input.equals("6")){//Listar titanes asesinados
-				System.out.println("[Cliente]["+nDistrito+"]Titanes asesinados");
+				System.out.println("[Cliente]["+nDistrito+"] "+asesinados+"\n");
 			}
 			else {
 				System.out.println("[Cliente]["+nDistrito+"]Ingrese algo valido");
