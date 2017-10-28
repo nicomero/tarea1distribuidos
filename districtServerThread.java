@@ -79,8 +79,37 @@ public class districtServerThread extends Thread {
 	public void run() {
 		//funcion que lee desde consola
 		inputLocal();
+		//Envía actualizaciones de titanes periodicamente mediante multicast
+		enviarActualizaciones();
 		//Escucha las instrucciones que da el cliente
 		escucharCliente(socket);
+	}
+
+	public void enviarActualizaciones(){
+		Thread t = new Thread(new Runnable(){
+			public void run(){
+				try{
+					DatagramSocket socket_multi = new DatagramSocket();
+
+					while(true){
+						//Enviar periódicamente cada 20 segundos
+						try {
+							sleep(20*1000);
+
+							String correo = "";
+							for(Map.Entry m:titanes.entrySet()){
+								correo += m.getKey()+" "+m.getValue()+"\n";
+							}
+							enviarU("ACTUALIZACION: "+correo, ipMulti, socket_multi);
+		                } catch (InterruptedException e) { }
+					}
+				}catch(IOException e){
+					System.out.println("enviarActualizaciones Distrito");
+					e.printStackTrace();
+				}
+			}
+		});
+		t.start();
 	}
 
 	public void inputLocal(){	//funcion que se encarga de leer de consola
@@ -112,7 +141,6 @@ public class districtServerThread extends Thread {
 					System.out.println("inputLocal Distrito");
 					e.printStackTrace();
 				}
-				//socket.close();
 			}
 		});
 		t.start();
