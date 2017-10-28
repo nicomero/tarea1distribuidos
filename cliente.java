@@ -42,6 +42,9 @@ public class cliente {
         //	CONECTARSE AL MAIN SERVER
 		//======================================================
 
+		HashMap<String,List<String>> capturados = new HashMap<String,List<String>>();
+		HashMap<String,List<String>> asesinados = new HashMap<String,List<String>>();
+
 		String ipServer = "";
 		String puertoServer = "";
 		String nDistrito = "";
@@ -88,7 +91,7 @@ public class cliente {
 
 			detectarMulti(socketD);//detecta si hay algo escrito en el multicast mediante thread
 
-			interfazCliente(socket, info, entradaScanner, nDistrito);//muestra la interfaz al cliente
+			interfazCliente(socket, info, entradaScanner, nDistrito, capturados, asesinados);//muestra la interfaz al cliente
 
 	        socketD.leaveGroup(address);
 	        socketD.close();
@@ -97,9 +100,10 @@ public class cliente {
 
 	//--------------------------------------------------------------------------
 
-	public static void interfazCliente(DatagramSocket socket, List<String> info, Scanner entradaScanner, String nDistrito){
+	public static void interfazCliente(DatagramSocket socket, List<String> info, Scanner entradaScanner, String nDistrito, HashMap<String,List<String>> capturados, HashMap<String,List<String>> asesinados){
 		String input;
 		boolean masTitan = true;
+		int i;
 		while(masTitan) {//mientras se quieran hacer acciones en el distrito actual
 
 			System.out.println ("[Cliente]["+nDistrito+"] Consola");
@@ -117,7 +121,7 @@ public class cliente {
 			if(input.equals("1")){//Listar titanes
 				enviarU(input,info.get(3),info.get(4),socket);
 				input=recibir(socket);
-				System.out.println ("[Cliente]["+nDistrito+"]LISTA DE TITANES:\n" + input);
+				System.out.println("[Cliente]["+nDistrito+"]LISTA DE TITANES:\n" + input);
 			}
 			else if (input.equals("2")){//cambiar distrito
 				masTitan = false;
@@ -125,21 +129,43 @@ public class cliente {
 			else if (input.equals("3")){//Capturar titan
 				enviarU(input,info.get(3),info.get(4),socket);
 				input=recibir(socket);
-				System.out.println ("[Cliente]["+nDistrito+"]Lo que llego fue:--" + input);
+				//["",[a,b,c],"",[a,b,c],...]
+				List<String> titanesDisponibles = new ArrayList<String>(Arrays.asList(input.split("/")));
+				List<String> sublista = new ArrayList<String>();
+				HashMap<String,List<String>> idDisponibles = new HashMap<String,List<String>>();
+				System.out.println("Elija un ID");
+				for(i=0;i<titanesDisponibles.size();i++){
+					int b = i%2;
+					if(b == 1){
+						sublista = Arrays.asList(titanesDisponibles.get(i).split(","));
+						idDisponibles.put(sublista.get(0),Arrays.asList(sublista.get(1),sublista.get(2)));
+						System.out.println(sublista.get(0)+".- Nombre: "+sublista.get(1)+", Tipo: "+sublista.get(2));
+					}
+				}
+				input = entradaScanner.nextLine();
+				while(!idDisponibles.containsKey(input)){
+					System.out.println("Por favor ingrese un ID valido");
+					input = entradaScanner.nextLine();
+				}
+
+				capturados.put(input,idDisponibles.get(input));
+				enviarU("3/"+input,info.get(3),info.get(4),socket);
+				System.out.println("¡Se ha capturado el titan con éxito!");
+
 			}
 			else if (input.equals("4")){//Asesinar titan
 				enviarU(input,info.get(3),info.get(4),socket);
 				input=recibir(socket);
-				System.out.println ("[Cliente]["+nDistrito+"]Lo que llego fue:--" + input);
+				System.out.println("[Cliente]["+nDistrito+"]Lo que llego fue:--" + input);
 			}
 			else if (input.equals("5")){//Listar titanes capturados
-				System.out.println ("[Cliente]["+nDistrito+"]Titanes capturados");
+				System.out.println("[Cliente]["+nDistrito+"] "+capturados);
 			}
 			else if (input.equals("6")){//Listar titanes asesinados
-				System.out.println ("[Cliente]["+nDistrito+"]Titanes asesinados");
+				System.out.println("[Cliente]["+nDistrito+"]Titanes asesinados");
 			}
 			else {
-				System.out.println ("[Cliente]["+nDistrito+"]Ingrese algo valido");
+				System.out.println("[Cliente]["+nDistrito+"]Ingrese algo valido");
 			}
 		}
 	}//end interfazCliente
