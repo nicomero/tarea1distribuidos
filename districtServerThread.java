@@ -39,7 +39,7 @@ public class districtServerThread extends Thread {
 	protected DatagramSocket socket = null;
 	protected BufferedReader in = null;
 	protected boolean more = true;
-	HashMap<Integer,String> titanes=new HashMap<Integer,String>();
+	HashMap<Integer,List<String>> titanes = new HashMap<Integer,List<String>>();
 	int puerto;
 	String ipServer = "";
 	String puertoServer = "";
@@ -94,15 +94,15 @@ public class districtServerThread extends Thread {
 
 					while(true){
 
-						String dString = new Date().toString();
+						List<String> titan ;
 
 						System.out.println("Escoja opcion [Publicar Titan]");
 						input = scan.nextLine();
 
 						if(input.equals("Publicar Titan")){
-							crearTitan();
-
-							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
+							int id = crearTitan();
+							titan = titanes.get(id);
+							enviarU("Aparece nuevo Titan! "+titan.get(0)+", tipo "+titan.get(1)+", ID "+Integer.toString(id), ipMulti, socket_multi);
 						}
 						else{
 							System.out.println("Ingrese mensaje valido");
@@ -205,34 +205,36 @@ public class districtServerThread extends Thread {
 			socket = new DatagramSocket();
 
 			Scanner scan = new Scanner(System.in);
-			String input, valor;
+			String input;
+			List<String> valores = new ArrayList<String>();
 
 			System.out.println("[Distrito "+nDistrito+"] Introducir Nombre");
 			input = scan.nextLine();
+			valores.add(input);
 			System.out.println("[Distrito "+nDistrito+"] Introducir Tipo");
 
 			while(true){
 				System.out.println("1.- Normal");
 				System.out.println("2.- Excentrico");
 				System.out.println("3.- Cambiante");
-				valor = scan.nextLine();
+				input = scan.nextLine();
 
-				if(valor.equals("1")){
-					input = input+","+valor;
+				if(input.equals("1")){
+					valores.add("Normal");
 					break ;
 				}
-				else if(valor.equals("2")){
-					input = input+","+valor;
+				else if(input.equals("2")){
+					valores.add("Excentrico");
 					break;
 				}
-				else if(valor.equals("3")){
-					input = input+","+valor;
+				else if(input.equals("3")){
+					valores.add("Cambiante");
 					break;
 				}
 				System.out.println("Ingrese una respuesta valida");
 			}
 
-
+			//Pide id sincronizado al servidor central
 			byte[] buf = new byte[256];
 			InetAddress address = InetAddress.getByName(ipServer);
 			String puerto_destino = puertoServer;
@@ -241,10 +243,16 @@ public class districtServerThread extends Thread {
 			socket.send(packet);
 
 			int id = Integer.parseInt(recibirSocket(socket));
-			titanes.put(id, input);
+			titanes.put(id, valores);
 			System.out.println("BORRAR: "+Arrays.asList(titanes));
 
-			System.out.println("[Distrito "+nDistrito+"] Se ha publicado el Titán: "+titanes.get(id));
+			System.out.println("[Distrito "+nDistrito+"] Se ha publicado el Titán: "+titanes.get(id).get(0));
+
+			System.out.println("**************");
+			System.out.println("ID: "+id);
+			System.out.println("Nombre: "+titanes.get(id).get(0));
+			System.out.println("Tipo: "+titanes.get(id).get(1));
+			System.out.println("**************");
 
 			return ;
 		}catch(IOException e) {

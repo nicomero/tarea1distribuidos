@@ -83,7 +83,6 @@ public class mainServerThread extends Thread {
 
 		            String received_D = recibir(packet);
 					if(received_D.equals("Xba1SS7lbAXmMe09aE12X2x")){
-						System.out.println("BORRAR: Pidiendo ids titanes...");
 			            //Se envía id titan a distrito
 						InetAddress address = packet.getAddress();
 						int port = packet.getPort();
