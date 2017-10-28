@@ -145,7 +145,7 @@ public class mainServerThread extends Thread {
 	    //extraer puerto y direccion
 	    InetAddress address = packet.getAddress();
 	    int port = packet.getPort();
-
+		int i;
 		/**agregar cliente al registro de clientes*/
 		String key = address.getHostAddress() + "," + Integer.toString(port);
 
@@ -153,9 +153,6 @@ public class mainServerThread extends Thread {
 			clientes_ubic.put(key,distrito);
 		}
 
-		System.out.println(Arrays.asList(clientes_ubic));
-
-		int i;
 		for(i=0;i<distritos.size();i++){
 			//Verifica que el distrito que está pidiendo se encuentra en el servidor central.
 			if(distritos.get(i).equals(distrito)){
@@ -170,12 +167,22 @@ public class mainServerThread extends Thread {
 					//enviar ip del distrito que solicito
 					//[nombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
 					enviarU(distrito+","+ipMulti.get(i)+","+puertoMulti.get(i)+","+ipPeti.get(i)+","+puertoPeti.get(i), address, port);
-					System.out.print("Nombre: "+distrito);
+					System.out.print("Nombre Distrito: "+distrito);
 					System.out.print(", IP Multicast: "+ipMulti.get(i));
 					System.out.print(", Puerto Multicast: "+puertoMulti.get(i));
 					System.out.print(", IP Peticiones: "+ipPeti.get(i));
 					System.out.println(", Puerto Peticiones: "+puertoPeti.get(i));
 				}
+
+				System.out.println("\nLISTADO CLIENTES");
+
+				Iterator it = clientes_ubic.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry pair = (Map.Entry)it.next();
+					System.out.println(pair.getKey() + " = " + pair.getValue());
+					//it.remove(); // avoids a ConcurrentModificationException
+				}
+				System.out.println("");
 				return;
 			}
 		}

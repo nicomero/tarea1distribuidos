@@ -249,7 +249,6 @@ public class districtServerThread extends Thread {
 
 			int id = Integer.parseInt(recibirSocket(socket));
 			titanes.put(id, valores);
-			System.out.println("BORRAR: "+Arrays.asList(titanes));
 
 			System.out.println("[Distrito "+nDistrito+"] Se ha publicado el Titán: "+titanes.get(id).get(0));
 
