@@ -85,7 +85,7 @@ public class cliente {
 			//puerto conexión multicast
 			//info.get(2)=puerto multicast distrito
 			//info.get(1)=ip multicast distrito
-	        final MulticastSocket socketD = new MulticastSocket(Integer.parseInt(info.get(2)));
+	        MulticastSocket socketD = new MulticastSocket(Integer.parseInt(info.get(2)));
 	        InetAddress address = InetAddress.getByName(info.get(1));
 	        socketD.joinGroup(address);
 
@@ -201,7 +201,7 @@ public class cliente {
 
 				while(!flag){//mientras NO halla fallo en el socket
 
-					String received_D = recibir(socketD);
+					final String received_D = recibir(socketD);
 					flag = received_D.equals("Fallo");
 					if (!flag){
 						System.out.println(received_D);
