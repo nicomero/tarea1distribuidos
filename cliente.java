@@ -85,7 +85,7 @@ public class cliente {
 			//puerto conexión multicast
 			//info.get(2)=puerto multicast distrito
 			//info.get(1)=ip multicast distrito
-	        MulticastSocket socketD = new MulticastSocket(Integer.parseInt(info.get(2)));
+	        final MulticastSocket socketD = new MulticastSocket(Integer.parseInt(info.get(2)));
 	        InetAddress address = InetAddress.getByName(info.get(1));
 	        socketD.joinGroup(address);
 
