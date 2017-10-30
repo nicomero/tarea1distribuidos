@@ -42,6 +42,9 @@ public class cliente {
         //	CONECTARSE AL MAIN SERVER
 		//======================================================
 
+		HashMap<String,List<String>> capturados = new HashMap<String,List<String>>();
+		HashMap<String,List<String>> asesinados = new HashMap<String,List<String>>();
+
 		String ipServer = "";
 		String puertoServer = "";
 		String nDistrito = "";
@@ -74,7 +77,6 @@ public class cliente {
 	        String received = recibir(socket);
 			//[NombreDistrito,ipMulticast,puertoMulticast,ipPeticiones,puertoPeticiones]
 			List<String> info = new ArrayList<String>(Arrays.asList(received.split(",")));
-			System.out.println("BORRAR: info distrito: "+info);
 
 			//======================================================
 	        //	CONECTARSE AL SERVIDOR DE UN DISTRITO
@@ -89,7 +91,7 @@ public class cliente {
 
 			detectarMulti(socketD);//detecta si hay algo escrito en el multicast mediante thread
 
-			interfazCliente(socket, info, entradaScanner);//muestra la interfaz al cliente
+			interfazCliente(socket, info, entradaScanner, nDistrito, capturados, asesinados);//muestra la interfaz al cliente
 
 	        socketD.leaveGroup(address);
 	        socketD.close();
@@ -98,26 +100,28 @@ public class cliente {
 
 	//--------------------------------------------------------------------------
 
-	public static void interfazCliente(DatagramSocket socket, List<String> info, Scanner entradaScanner){
+	public static void interfazCliente(DatagramSocket socket, List<String> info, Scanner entradaScanner, String nDistrito, HashMap<String,List<String>> capturados, HashMap<String,List<String>> asesinados){
 		String input;
 		boolean masTitan = true;
+		int i;
 		while(masTitan) {//mientras se quieran hacer acciones en el distrito actual
 
-			System.out.println ("[Cliente] Consola");
-			System.out.println ("[Cliente] (1) Listar Titanes");
-			System.out.println ("[Cliente] (2) Cambiar Distrito");
-			System.out.println ("[Cliente] (3) Capturar Titan");
-			System.out.println ("[Cliente] (4) Asesinar Titan");
-			System.out.println ("[Cliente] (5) Listar Titanes Capturados");
-			System.out.println ("[Cliente] (6) Listar Titanes Asesinados");
+			System.out.println ("[Cliente]["+nDistrito+"] Consola");
+			System.out.println ("[Cliente]["+nDistrito+"] (1) Listar Titanes");
+			System.out.println ("[Cliente]["+nDistrito+"] (2) Cambiar Distrito");
+			System.out.println ("[Cliente]["+nDistrito+"] (3) Capturar Titan");
+			System.out.println ("[Cliente]["+nDistrito+"] (4) Asesinar Titan");
+			System.out.println ("[Cliente]["+nDistrito+"] (5) Listar Titanes Capturados");
+			System.out.println ("[Cliente]["+nDistrito+"] (6) Listar Titanes Asesinados");
 
 			input = entradaScanner.nextLine();
+
 			//info.get(3)=IP Peticiones
 			//info.get(4)=Puerto Peticionoes
 			if(input.equals("1")){//Listar titanes
 				enviarU(input,info.get(3),info.get(4),socket);
 				input=recibir(socket);
-				System.out.println ("[Cliente] Lo que llego fue:--" + input);
+				System.out.println("[Cliente]["+nDistrito+"]LISTA DE TITANES:\n" + input);
 			}
 			else if (input.equals("2")){//cambiar distrito
 				masTitan = false;
@@ -125,21 +129,65 @@ public class cliente {
 			else if (input.equals("3")){//Capturar titan
 				enviarU(input,info.get(3),info.get(4),socket);
 				input=recibir(socket);
-				System.out.println ("[Cliente] Lo que llego fue:--" + input);
+				//["",[a,b,c],"",[a,b,c],...]
+				List<String> titanesDisponibles = new ArrayList<String>(Arrays.asList(input.split("/")));
+				List<String> sublista = new ArrayList<String>();
+				HashMap<String,List<String>> idDisponibles = new HashMap<String,List<String>>();
+				System.out.println("Elija un ID");
+				for(i=0;i<titanesDisponibles.size();i++){
+					int b = i%2;
+					if(b == 1){
+						sublista = Arrays.asList(titanesDisponibles.get(i).split(","));
+						idDisponibles.put(sublista.get(0),Arrays.asList(sublista.get(1),sublista.get(2)));
+						System.out.println(sublista.get(0)+".- Nombre: "+sublista.get(1)+", Tipo: "+sublista.get(2));
+					}
+				}
+				input = entradaScanner.nextLine();
+				while(!idDisponibles.containsKey(input)){
+					System.out.println("Por favor ingrese un ID valido");
+					input = entradaScanner.nextLine();
+				}
+
+				capturados.put(input,idDisponibles.get(input));
+				enviarU("3/"+input,info.get(3),info.get(4),socket);
+				System.out.println("¡Se ha capturado el titan con éxito!");
+
 			}
 			else if (input.equals("4")){//Asesinar titan
 				enviarU(input,info.get(3),info.get(4),socket);
 				input=recibir(socket);
-				System.out.println ("[Cliente] Lo que llego fue:--" + input);
+				//["",[a,b,c],"",[a,b,c],...]
+				List<String> titanesDisponibles = new ArrayList<String>(Arrays.asList(input.split("/")));
+				List<String> sublista = new ArrayList<String>();
+				HashMap<String,List<String>> idDisponibles = new HashMap<String,List<String>>();
+				System.out.println("Elija un ID");
+				for(i=0;i<titanesDisponibles.size();i++){
+					int b = i%2;
+					if(b == 1){
+						sublista = Arrays.asList(titanesDisponibles.get(i).split(","));
+						idDisponibles.put(sublista.get(0),Arrays.asList(sublista.get(1),sublista.get(2)));
+						System.out.println(sublista.get(0)+".- Nombre: "+sublista.get(1)+", Tipo: "+sublista.get(2));
+					}
+				}
+				input = entradaScanner.nextLine();
+				while(!idDisponibles.containsKey(input)){
+					System.out.println("Por favor ingrese un ID valido");
+					input = entradaScanner.nextLine();
+				}
+
+				asesinados.put(input,idDisponibles.get(input));
+				enviarU("4/"+input,info.get(3),info.get(4),socket);
+				System.out.println("¡Se ha asesinado el titan con éxito!");
+
 			}
 			else if (input.equals("5")){//Listar titanes capturados
-				System.out.println ("[Cliente] Titanes capturados");
+				System.out.println("[Cliente]["+nDistrito+"] "+capturados+"\n");
 			}
 			else if (input.equals("6")){//Listar titanes asesinados
-				System.out.println ("[Cliente] Titanes asesinados");
+				System.out.println("[Cliente]["+nDistrito+"] "+asesinados+"\n");
 			}
 			else {
-				System.out.println ("[Cliente] Ingrese algo valido");
+				System.out.println("[Cliente]["+nDistrito+"]Ingrese algo valido");
 			}
 		}
 	}//end interfazCliente
@@ -156,7 +204,7 @@ public class cliente {
 					String received_D = recibir(socketD);
 					flag = received_D.equals("Fallo");
 					if (!flag){
-						System.out.println("Date: " + received_D);
+						System.out.println(received_D);
 					}
 				}
 			}

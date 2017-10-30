@@ -39,7 +39,7 @@ public class districtServerThread extends Thread {
 	protected DatagramSocket socket = null;
 	protected BufferedReader in = null;
 	protected boolean more = true;
-	HashMap<Integer,String> titanes=new HashMap<Integer,String>();
+	HashMap<Integer,List<String>> titanes = new HashMap<Integer,List<String>>();
 	int puerto;
 	String ipServer = "";
 	String puertoServer = "";
@@ -79,8 +79,37 @@ public class districtServerThread extends Thread {
 	public void run() {
 		//funcion que lee desde consola
 		inputLocal();
+		//Envía actualizaciones de titanes periodicamente mediante multicast
+		enviarActualizaciones();
 		//Escucha las instrucciones que da el cliente
 		escucharCliente(socket);
+	}
+
+	public void enviarActualizaciones(){
+		Thread t = new Thread(new Runnable(){
+			public void run(){
+				try{
+					DatagramSocket socket_multi = new DatagramSocket();
+
+					while(true){
+						//Enviar periódicamente cada 40 segundos
+						try {
+							sleep(40*1000);
+
+							String correo = "";
+							for(Map.Entry m:titanes.entrySet()){
+								correo += m.getKey()+" "+m.getValue()+"\n";
+							}
+							enviarU("ACTUALIZACION:\n"+correo, ipMulti, socket_multi);
+		                } catch (InterruptedException e) { }
+					}
+				}catch(IOException e){
+					System.out.println("enviarActualizaciones Distrito");
+					e.printStackTrace();
+				}
+			}
+		});
+		t.start();
 	}
 
 	public void inputLocal(){	//funcion que se encarga de leer de consola
@@ -94,15 +123,15 @@ public class districtServerThread extends Thread {
 
 					while(true){
 
-						String dString = new Date().toString();
+						List<String> titan ;
 
 						System.out.println("Escoja opcion [Publicar Titan]");
 						input = scan.nextLine();
 
 						if(input.equals("Publicar Titan")){
-							crearTitan();
-
-							enviarU(dString+" "+nDistrito, ipMulti, socket_multi);
+							int id = crearTitan();
+							titan = titanes.get(id);
+							enviarU("Aparece nuevo Titan! "+titan.get(0)+", tipo "+titan.get(1)+", ID "+Integer.toString(id), ipMulti, socket_multi);
 						}
 						else{
 							System.out.println("Ingrese mensaje valido");
@@ -112,7 +141,6 @@ public class districtServerThread extends Thread {
 					System.out.println("inputLocal Distrito");
 					e.printStackTrace();
 				}
-				//socket.close();
 			}
 		});
 		t.start();
@@ -129,14 +157,62 @@ public class districtServerThread extends Thread {
 				String received_D = recibir(packet);//recibir peticiones del cliente
 				System.out.println("mensaje recibido: " + received_D);
 
+				String correo = "";
+				List<List<String>> listado = new ArrayList<List<String>>();
+
 				if (received_D.equals("1")){//cliente quiere ver titanes
-					enviarC("Lista de titanes",packet ,socket);
+					for(Map.Entry m:titanes.entrySet()){
+   						correo += m.getKey()+" "+m.getValue()+"\n";
+  					}
+					enviarC(correo, packet, socket);
 				}
 				else if (received_D.equals("3")){//cliente quiere capturar titanes
-					enviarC("Info titan capturado",packet ,socket);
+					//Pasando listas a string, preferible no entender.
+					Iterator it = titanes.entrySet().iterator();
+					while (it.hasNext()) {
+						Map.Entry pair = (Map.Entry)it.next();
+						if(!titanes.get(pair.getKey()).get(1).equals("Excentrico")){
+							listado.add(Arrays.asList(pair.getKey().toString(),titanes.get(pair.getKey()).get(0),titanes.get(pair.getKey()).get(1)));
+						}
+					}
+					System.out.println(listado);
+					for (List<String> s : listado){
+						correo += s + "";
+					}
+					String a;
+					a = correo.replaceAll("\\[", "/").replaceAll("]", "/");
+					correo = a.replaceAll(" ", "");
+
+					System.out.println(correo);
+					enviarC(correo, packet ,socket);
+				}
+				else if (received_D.contains("3/")){//cliente captura titan
+					List<String> capturando = new ArrayList<String>(Arrays.asList(received_D.split("/")));
+					titanes.remove(Integer.parseInt(capturando.get(1)));
 				}
 				else if (received_D.equals("4")){//cliente quiere matar titanes
-					enviarC("Info titan muerto",packet ,socket);
+					//Pasando listas a string, preferible no entender.
+					Iterator it = titanes.entrySet().iterator();
+					while (it.hasNext()) {
+						Map.Entry pair = (Map.Entry)it.next();
+						if(!titanes.get(pair.getKey()).get(1).equals("Cambiante")){
+							listado.add(Arrays.asList(pair.getKey().toString(),titanes.get(pair.getKey()).get(0),titanes.get(pair.getKey()).get(1)));
+						}
+					}
+					System.out.println(listado);
+					for (List<String> s : listado){
+						correo += s + "";
+					}
+					String a;
+					a = correo.replaceAll("\\[", "/").replaceAll("]", "/");
+					correo = a.replaceAll(" ", "");
+
+					System.out.println(correo);
+					enviarC(correo, packet ,socket);
+				}
+				else if (received_D.contains("4/")){//cliente mata titan
+					List<String> asesinando = new ArrayList<String>(Arrays.asList(received_D.split("/")));
+					titanes.remove(Integer.parseInt(asesinando.get(1)));
 				}
 			}
 			socket.close();
@@ -200,39 +276,41 @@ public class districtServerThread extends Thread {
         return "Fallo";
 	}
 
-	public void crearTitan(){
+	public int crearTitan(){
 		try{
 			socket = new DatagramSocket();
 
 			Scanner scan = new Scanner(System.in);
-			String input, valor;
+			String input;
+			List<String> valores = new ArrayList<String>();
 
 			System.out.println("[Distrito "+nDistrito+"] Introducir Nombre");
 			input = scan.nextLine();
+			valores.add(input);
 			System.out.println("[Distrito "+nDistrito+"] Introducir Tipo");
 
 			while(true){
 				System.out.println("1.- Normal");
 				System.out.println("2.- Excentrico");
 				System.out.println("3.- Cambiante");
-				valor = scan.nextLine();
+				input = scan.nextLine();
 
-				if(valor.equals("1")){
-					input = input+","+valor;
+				if(input.equals("1")){
+					valores.add("Normal");
 					break ;
 				}
-				else if(valor.equals("2")){
-					input = input+","+valor;
+				else if(input.equals("2")){
+					valores.add("Excentrico");
 					break;
 				}
-				else if(valor.equals("3")){
-					input = input+","+valor;
+				else if(input.equals("3")){
+					valores.add("Cambiante");
 					break;
 				}
 				System.out.println("Ingrese una respuesta valida");
 			}
 
-
+			//Pide id sincronizado al servidor central
 			byte[] buf = new byte[256];
 			InetAddress address = InetAddress.getByName(ipServer);
 			String puerto_destino = puertoServer;
@@ -241,17 +319,22 @@ public class districtServerThread extends Thread {
 			socket.send(packet);
 
 			int id = Integer.parseInt(recibirSocket(socket));
-			titanes.put(id, input);
-			System.out.println("BORRAR: "+Arrays.asList(titanes));
+			titanes.put(id, valores);
 
-			System.out.println("[Distrito "+nDistrito+"] Se ha publicado el Titán: "+titanes.get(id));
+			System.out.println("[Distrito "+nDistrito+"] Se ha publicado el Titán: "+titanes.get(id).get(0));
 
-			return ;
+			System.out.println("**************");
+			System.out.println("ID: "+id);
+			System.out.println("Nombre: "+titanes.get(id).get(0));
+			System.out.println("Tipo: "+titanes.get(id).get(1));
+			System.out.println("**************");
+
+			return id;
 		}catch(IOException e) {
 			System.out.println("crearTitan Distrito");
 			e.printStackTrace();
 		}
-
+		return -1;
 	}
 
 }//end districtServerThread
