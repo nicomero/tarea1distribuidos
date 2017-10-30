@@ -192,7 +192,7 @@ public class cliente {
 		}
 	}//end interfazCliente
 
-	public static void detectarMulti(MulticastSocket socketD){
+	public static void detectarMulti(final MulticastSocket socketD){
 		Thread t = new Thread(new Runnable(){
 
 			public void run(){
@@ -201,7 +201,7 @@ public class cliente {
 
 				while(!flag){//mientras NO halla fallo en el socket
 
-					final String received_D = recibir(socketD);
+				 	String received_D = recibir(socketD);
 					flag = received_D.equals("Fallo");
 					if (!flag){
 						System.out.println(received_D);
