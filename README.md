@@ -1,38 +1,42 @@
-# tarea1distribuidos
-Nicolas Alarcon 201473522-7
+# Tarea 1 Sistemas Distribuidos
+
+Nicolás Alarcón 201473522-7
 
 Rodrigo Elicer  201473539-1
 
+|MÁQUINAS|IP|
+|----|----|
+|dist07.inf.santiago.usm.cl|10.6.40.157|
+|dist08.inf.santiago.usm.cl|10.6.40.158|
+|dist09.inf.santiago.usm.cl|10.6.40.159|
 
-MAQUINAS                      IP
+## INSTRUCCIONES DE COMPILACIÓN Y EJECUCIÓN
 
-dist07.inf.santiago.usm.cl	inet 10.6.40.157/24 brd 10.6.40.255
-
-dist08.inf.santiago.usm.cl	inet 10.6.40.158/24 brd 10.6.40.255
-
-dist09.inf.santiago.usm.cl	inet 10.6.40.159/24 brd 10.6.40.255
-
-
-*INSTRUCCIONES DE COMPILACION Y EJECUCION
-
--En cada maquina ejecutar el comando:
+### En cada maquina ejecutar el comando:
 ```
-  $ make
-  ```
--En cada maquina ejecutar el comando:
-  ```
-  $ java <nombre_clase>
-  ```
-  Los nombres de las clases pueden ser:
+$ make
+```
+### Luego ejecutar el comando:
+```
+$ java <nombre_clase>
+```
+Los nombres de las clases pueden ser:
 
-mainServer          es el servidor central
+|.class|Descripción|
+|----|----|
+|mainServer|Servidor Central|
+|districtServer|Representa a los distritos|
+|cliente|Representa a los jugadores|
 
-districtServer      es la clase que representa un distrito
-
-cliente             es la clase que representa a los jugadores
-
-
-/////////EJEMPLO PARA EJECUTAR EN VARIAS MAQUINAS ////  
+## EJEMPLO PARA EJECUTAR EN VARIAS MÁQUINAS
+#### Primero habrá que conectarse a la red del DI
+```
+ssh <nombre.apellido>@ssh2.inf.utfsm.cl
+```
+#### Una vez dentro, habrá que conectarse a las distintas máquinas.
+```
+ssh root@distXX.inf.santiago.usm.cl
+```
 
 * Abrir mainServer en dist07.inf.santiago.usm.cl
 ```
@@ -45,7 +49,7 @@ Trost
 5555
 [Servidor Central] IP Peticiones:
 10.6.40.158
-[Servidor Central] Puerto Peticiones"
+[Servidor Central] Puerto Peticiones:
 6789
 ¿Desea seguir agregando distritos?[y/n]
 n
@@ -79,9 +83,7 @@ Trost
 Trost
 ```
 
-
-
-///////// EJEMPLO PARA EJECUTAR EN UNA SOLA MAQUINA ////  
+## EJEMPLO PARA EJECUTAR EN UNA SOLA MÁQUINA
 
 * Abrir mainServer
 ```
